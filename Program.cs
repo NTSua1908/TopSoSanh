@@ -10,6 +10,17 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(
+        builder =>
+        {
+            builder.WithOrigins("http://localhost:3000", "null")
+                                .AllowAnyHeader()
+                                .AllowAnyMethod();
+        });
+});
+
 builder.Services.AddScoped<ICrawlDataPhongVuService, CrawlDataPhongVuService>();
 builder.Services.AddScoped<ICrawlDataGearvnService, CrawlDataGearvnService>();
 builder.Services.AddScoped<ICrawlDataTheGioDiDongService, CrawlDataTheGioDiDongService>();
@@ -28,6 +39,8 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+
+app.UseCors();
 
 app.MapControllers();
 

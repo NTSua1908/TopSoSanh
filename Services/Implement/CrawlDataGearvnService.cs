@@ -3,6 +3,7 @@ using HtmlAgilityPack;
 using System.Net;
 using TopSoSanh.DTO;
 using TopSoSanh.Services.Interface;
+using TopSoSanh.Helper;
 
 namespace TopSoSanh.Services.Implement
 {
@@ -29,6 +30,29 @@ namespace TopSoSanh.Services.Implement
             }
 
             return crawlDataModels;
+        }
+
+        public CrawlDetailModel CrawlDetail(string url)
+        {
+            CrawlDetailModel crawlDetailModel = new CrawlDetailModel();
+            HtmlWeb web = new HtmlWeb();
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+            HtmlDocument doc = web.Load(url);
+
+            crawlDetailModel.Name = doc.DocumentNode.QuerySelector("h1.product_name").InnerText.Trim();
+            crawlDetailModel.Price = doc.DocumentNode.QuerySelector("span.product_sale_price").InnerText.Trim();
+            crawlDetailModel.Description = new List<KeyValuePair<string, string>>();
+
+            var descriptionNodes = doc.DocumentNode.QuerySelectorAll("div.tab-content .tab-pane table tr");
+
+            foreach (var descriptionNode in descriptionNodes)
+            {
+                List<string> descriptionTag = descriptionNode.QuerySelectorAll("span").Select(x => x.InnerText).ToList();
+                KeyValuePair<string, string> keyValuePair = new KeyValuePair<string, string>(descriptionTag[0].RemoveBreakLineTab(), descriptionTag[descriptionTag.Count - 1].RemoveBreakLineTab());
+                crawlDetailModel.Description.Add(keyValuePair);
+            }
+
+            return crawlDetailModel;
         }
 
     }
