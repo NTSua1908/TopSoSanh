@@ -36,6 +36,12 @@ namespace TopSoSanh.Controllers
             return _crawlDataGearvnService.CrawlData(keyword);
         }
 
+        [HttpGet("gearvnDetail")]
+        public CrawlDetailModel getDetailFromGearVN(string url)
+        {
+            return _crawlDataGearvnService.CrawlDetail(url);
+        }
+
         [HttpGet("thegioididong")]
         public List<CrawlDataModel> getDataFromTheGioiDiDong(string keyword)
         {
@@ -46,6 +52,12 @@ namespace TopSoSanh.Controllers
         public List<CrawlDataModel> getDataFromZShop(string keyword)
         {
             return _crawlDataZShopService.CrawlData(keyword);
+        }
+
+        [HttpGet("zshopDetail")]
+        public CrawlDetailModel getDetailFromZShop(string url)
+        {
+            return _crawlDataZShopService.CrawlDetail(url);
         }
     }
 }
