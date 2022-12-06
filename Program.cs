@@ -23,8 +23,9 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddScoped<ICrawlDataPhongVuService, CrawlDataPhongVuService>();
 builder.Services.AddScoped<ICrawlDataGearvnService, CrawlDataGearvnService>();
-builder.Services.AddScoped<ICrawlDataTheGioDiDongService, CrawlDataTheGioDiDongService>();
+builder.Services.AddScoped<ICrawlDataAnphat, CrawlDataAnphat>();
 builder.Services.AddScoped<ICrawlDataZShopService, CrawlDataZShopService>();
+builder.Services.AddScoped<ICrawlDataCommon, CrawlDataCommon>();
 
 var app = builder.Build();
 

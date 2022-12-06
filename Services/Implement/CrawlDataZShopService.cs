@@ -5,6 +5,8 @@ using TopSoSanh.Services.Interface;
 using Fizzler.Systems.HtmlAgilityPack;
 using System.Text;
 using TopSoSanh.Helper;
+using System.Reflection;
+using System.Xml.Linq;
 
 namespace TopSoSanh.Services.Implement
 {
@@ -24,10 +26,25 @@ namespace TopSoSanh.Services.Implement
                 if (!node.QuerySelector(".stock-block").InnerText.Contains("Tạm hết hàng") &&
                     !node.QuerySelector(".block-bottom").InnerText.Contains("Liên hệ để biết giá"))
                 {
-                    CrawlDataModel model = new CrawlDataModel();
+                    CrawlDataModel model = new CrawlDataModel(ShopName.ZShop);
 
                     model.Name = node.QuerySelector(".ty-grid-list__item-name").InnerText;
-                    model.Price = node.QuerySelector(".block-bottom .ty-price span").InnerText;
+                    //model.Price = Double.Parse(
+                    //    node.QuerySelector(".block-bottom .ty-price span")
+                    //    .InnerText
+                    //    .GetNumbers()
+                    //);
+                    model.OldPrice = Double.Parse(
+                        node.QuerySelector(".ty-strike span.ty-list-price")?
+                        .InnerText
+                        .GetNumbers() ?? "0"
+                    );
+                    model.NewPrice = Double.Parse(
+                        node.QuerySelector(".block-bottom .ty-price span")
+                        .InnerText
+                        .GetNumbers()
+                    );
+                    //
                     model.ItemUrl = node.QuerySelector(".ty-grid-list__item-name a").Attributes["href"].Value;
                     model.ImageUrl = node.QuerySelector(".ty-grid-list__image .abt-single-image img").Attributes["data-srcset"].Value.Split(" ")[0];
                     crawlDataModels.Add(model);
@@ -45,7 +62,17 @@ namespace TopSoSanh.Services.Implement
             HtmlDocument doc = web.Load(url);
 
             crawlDetailModel.Name = doc.DocumentNode.QuerySelector("h1.ty-product-block-title").InnerText.Trim();
-            crawlDetailModel.Price = doc.DocumentNode.QuerySelector("span.ty-price span.ty-price-num").InnerText.Trim();
+            //crawlDetailModel.Price = doc.DocumentNode.QuerySelector("span.ty-price span.ty-price-num").InnerText.Trim();
+            crawlDetailModel.OldPrice = Double.Parse(
+                doc.DocumentNode.QuerySelector(".ty-strike span.ty-list-price")?
+                .InnerText
+                .GetNumbers() ?? "0"
+            );
+            crawlDetailModel.NewPrice = Double.Parse(
+                doc.DocumentNode.QuerySelector("span.ty-price span.ty-price-num")
+                .InnerText
+                .GetNumbers()
+            );
             crawlDetailModel.Description = new List<KeyValuePair<string, string>>();
 
             var descriptionNodes = doc.DocumentNode.QuerySelectorAll("div#content_features .ty-product-feature");

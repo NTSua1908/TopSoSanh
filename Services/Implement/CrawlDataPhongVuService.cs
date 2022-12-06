@@ -6,6 +6,7 @@ using TopSoSanh.Services.Interface;
 using Fizzler.Systems.HtmlAgilityPack;
 using System.Text.Json.Serialization;
 using System.Text.Json;
+using TopSoSanh.Helper;
 
 namespace TopSoSanh.Services.Implement
 {
@@ -56,7 +57,7 @@ namespace TopSoSanh.Services.Implement
                     discount = double.Parse(discountPercent.Substring(1, discountPercent.Length - 2));
                 }
 
-                model.Price = price;
+                //model.Price = Double.Parse(price.GetNumbers());
                 //model.DiscountPercent = discount;
                 model.ItemUrl = "https://phongvu.vn" + node.QuerySelector("a.css-pxdb0j").Attributes["href"].Value;
                 model.ImageUrl = node.QuerySelector("a.css-pxdb0j > .css-1v97aik  .css-1uzm8bv img").Attributes["src"].Value;

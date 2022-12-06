@@ -10,51 +10,61 @@ namespace TopSoSanh.Controllers
     {
         private readonly ICrawlDataPhongVuService _crawlDataPhongVuService;
         private readonly ICrawlDataGearvnService _crawlDataGearvnService;
-        private readonly ICrawlDataTheGioDiDongService _crawlDataTheGioDiDongService;
+        private readonly ICrawlDataAnphat _crawlDataAnphatService;
         private readonly ICrawlDataZShopService _crawlDataZShopService;
+        private readonly ICrawlDataCommon _crawlDataCommon;
 
         public CrawlDataController(ICrawlDataPhongVuService crawlDataPhongVuService, 
             ICrawlDataGearvnService crawlDataGearvnService, 
-            ICrawlDataTheGioDiDongService crawlDataTheGioDiDongService,
-            ICrawlDataZShopService crawlDataZShopService)
+            ICrawlDataAnphat crawlDataAnphatService,
+            ICrawlDataZShopService crawlDataZShopService,
+            ICrawlDataCommon crawlDataCommon)
         {
             _crawlDataPhongVuService = crawlDataPhongVuService;
             _crawlDataGearvnService = crawlDataGearvnService;
-            _crawlDataTheGioDiDongService = crawlDataTheGioDiDongService;
+            _crawlDataAnphatService = crawlDataAnphatService;
             _crawlDataZShopService = crawlDataZShopService;
+            _crawlDataCommon = crawlDataCommon;
         }
 
-        [HttpGet("phongvu")]
-        public async Task<List<CrawlDataModel>> getDataFromPhongVu(string keyword)
+        [HttpGet("Common")]
+        public PaginationDataModel getData([FromQuery] PaginationRequestModel req)
         {
-            return await _crawlDataPhongVuService.CrawlData(keyword);
+            req.Format();
+            return _crawlDataCommon.getData(req);
         }
 
-        [HttpGet("gearvn")]
+        //[HttpGet("phongvu")]
+        //public async Task<List<CrawlDataModel>> getDataFromPhongVu(string keyword)
+        //{
+        //    return await _crawlDataPhongVuService.CrawlData(keyword);
+        //}
+
+        [HttpGet("Gearvn")]
         public List<CrawlDataModel> getDataFromGearVN(string keyword)
         {
             return _crawlDataGearvnService.CrawlData(keyword);
         }
 
-        [HttpGet("gearvnDetail")]
+        [HttpGet("GearvnDetail")]
         public CrawlDetailModel getDetailFromGearVN(string url)
         {
             return _crawlDataGearvnService.CrawlDetail(url);
         }
 
-        [HttpGet("thegioididong")]
-        public List<CrawlDataModel> getDataFromTheGioiDiDong(string keyword)
+        [HttpGet("AnPhat")]
+        public List<CrawlDataModel> getDataFromAnphat(string keyword)
         {
-            return _crawlDataTheGioDiDongService.CrawlData(keyword);
+            return _crawlDataAnphatService.CrawlData(keyword);
         }
 
-        [HttpGet("zshop")]
+        [HttpGet("Zshop")]
         public List<CrawlDataModel> getDataFromZShop(string keyword)
         {
             return _crawlDataZShopService.CrawlData(keyword);
         }
 
-        [HttpGet("zshopDetail")]
+        [HttpGet("ZshopDetail")]
         public CrawlDetailModel getDetailFromZShop(string url)
         {
             return _crawlDataZShopService.CrawlDetail(url);

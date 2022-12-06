@@ -1,18 +1,23 @@
-﻿namespace TopSoSanh.DTO
+﻿using TopSoSanh.Helper;
+
+namespace TopSoSanh.DTO
 {
     public class CrawlDataModel
     {
         public string Name { get; set; }
         public string ItemUrl { get; set; }
         public string ImageUrl { get; set; }
-        public string Price { get; set; }
+        public double OldPrice { get; set; }
+        public double NewPrice { get; set; }
+        public ShopName ShopName { get; set; }
         //public double DiscountPercent { get; set; }
         //public string Location { get; set; } = "Unknown";
 
-        public override string? ToString()
+        public CrawlDataModel() { }
+
+        public CrawlDataModel(ShopName shopName)
         {
-            //return $"{Name}\n{Price}\n{DiscountPercent}\n{Location}\n{ItemUrl}\n{ImageUrl}\n--------------------";
-            return $"{Name}\n{Price}\n{ItemUrl}\n{ImageUrl}\n--------------------";
+            this.ShopName = shopName;
         }
     }
 }
