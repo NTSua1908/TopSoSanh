@@ -23,32 +23,30 @@ namespace TopSoSanh.Services.Implement
 
             foreach (var node in nodeItems)
             {
-                if (!node.QuerySelector(".stock-block").InnerText.Contains("Tạm hết hàng") &&
-                    !node.QuerySelector(".block-bottom").InnerText.Contains("Liên hệ để biết giá"))
+                try
                 {
-                    CrawlDataModel model = new CrawlDataModel(ShopName.ZShop);
+                    if (!node.QuerySelector(".stock-block").InnerText.Contains("Tạm hết hàng") &&
+                        !node.QuerySelector(".block-bottom").InnerText.Contains("Liên hệ để biết giá"))
+                    {
+                        CrawlDataModel model = new CrawlDataModel();
 
-                    model.Name = node.QuerySelector(".ty-grid-list__item-name").InnerText;
-                    //model.Price = Double.Parse(
-                    //    node.QuerySelector(".block-bottom .ty-price span")
-                    //    .InnerText
-                    //    .GetNumbers()
-                    //);
-                    model.OldPrice = Double.Parse(
-                        node.QuerySelector(".ty-strike span.ty-list-price")?
-                        .InnerText
-                        .GetNumbers() ?? "0"
-                    );
-                    model.NewPrice = Double.Parse(
-                        node.QuerySelector(".block-bottom .ty-price span")
-                        .InnerText
-                        .GetNumbers()
-                    );
-                    //
-                    model.ItemUrl = node.QuerySelector(".ty-grid-list__item-name a").Attributes["href"].Value;
-                    model.ImageUrl = node.QuerySelector(".ty-grid-list__image .abt-single-image img").Attributes["data-srcset"].Value.Split(" ")[0];
-                    crawlDataModels.Add(model);
+                        model.Name = node.QuerySelector(".ty-grid-list__item-name").InnerText;
+                        model.OldPrice = Double.Parse(
+                            node.QuerySelector(".ty-strike span.ty-list-price")?
+                            .InnerText
+                            .GetNumbers() ?? "0"
+                        );
+                        model.NewPrice = Double.Parse(
+                            node.QuerySelector(".block-bottom .ty-price span")
+                            .InnerText
+                            .GetNumbers()
+                        );
+                        model.ItemUrl = node.QuerySelector(".ty-grid-list__item-name a").Attributes["href"].Value;
+                        model.ImageUrl = node.QuerySelector(".ty-grid-list__image .abt-single-image img").Attributes["data-srcset"].Value.Split(" ")[0];
+                        crawlDataModels.Add(model);
+                    }
                 }
+                catch (Exception e) { };
             }
 
             return crawlDataModels;
@@ -61,36 +59,40 @@ namespace TopSoSanh.Services.Implement
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
             HtmlDocument doc = web.Load(url);
 
-            crawlDetailModel.Name = doc.DocumentNode.QuerySelector("h1.ty-product-block-title").InnerText.Trim();
-            //crawlDetailModel.Price = doc.DocumentNode.QuerySelector("span.ty-price span.ty-price-num").InnerText.Trim();
-            crawlDetailModel.OldPrice = Double.Parse(
-                doc.DocumentNode.QuerySelector(".ty-strike span.ty-list-price")?
-                .InnerText
-                .GetNumbers() ?? "0"
-            );
-            crawlDetailModel.NewPrice = Double.Parse(
-                doc.DocumentNode.QuerySelector("span.ty-price span.ty-price-num")
-                .InnerText
-                .GetNumbers()
-            );
-            crawlDetailModel.Description = new List<KeyValuePair<string, string>>();
-
-            var descriptionNodes = doc.DocumentNode.QuerySelectorAll("div#content_features .ty-product-feature");
-
-            foreach (var descriptionNode in descriptionNodes)
+            try
             {
-                if (descriptionNode.QuerySelector(".ty-compare-checkbox") != null)
-                    continue;
-                //KeyValuePair<string, string> keyValuePair = new KeyValuePair<string, string>(
-                //    HtmlTaker.getContent(new StringBuilder(descriptionNode.QuerySelector(".ty-product-feature__label").InnerText)).ToString().RemoveBreakLineTab(),
-                //    HtmlTaker.getContent(new StringBuilder(descriptionNode.QuerySelector(".ty-product-feature__value").InnerText)).ToString().RemoveBreakLineTab()
-                //);
-                KeyValuePair<string, string> keyValuePair = new KeyValuePair<string, string>(
-                    descriptionNode.QuerySelector(".ty-product-feature__label").InnerText.RemoveBreakLineTab(),
-                    descriptionNode.QuerySelector(".ty-product-feature__value").InnerText.RemoveBreakLineTab()
+                crawlDetailModel.Name = doc.DocumentNode.QuerySelector("h1.ty-product-block-title").InnerText.Trim();
+                //crawlDetailModel.Price = doc.DocumentNode.QuerySelector("span.ty-price span.ty-price-num").InnerText.Trim();
+                crawlDetailModel.OldPrice = Double.Parse(
+                    doc.DocumentNode.QuerySelector(".ty-strike span.ty-list-price")?
+                    .InnerText
+                    .GetNumbers() ?? "0"
                 );
-                crawlDetailModel.Description.Add(keyValuePair);
+                crawlDetailModel.NewPrice = Double.Parse(
+                    doc.DocumentNode.QuerySelector("span.ty-price span.ty-price-num")
+                    .InnerText
+                    .GetNumbers()
+                );
+                crawlDetailModel.Description = new List<KeyValuePair<string, string>>();
+
+                var descriptionNodes = doc.DocumentNode.QuerySelectorAll("div#content_features .ty-product-feature");
+
+                foreach (var descriptionNode in descriptionNodes)
+                {
+                    if (descriptionNode.QuerySelector(".ty-compare-checkbox") != null)
+                        continue;
+                    //KeyValuePair<string, string> keyValuePair = new KeyValuePair<string, string>(
+                    //    HtmlTaker.getContent(new StringBuilder(descriptionNode.QuerySelector(".ty-product-feature__label").InnerText)).ToString().RemoveBreakLineTab(),
+                    //    HtmlTaker.getContent(new StringBuilder(descriptionNode.QuerySelector(".ty-product-feature__value").InnerText)).ToString().RemoveBreakLineTab()
+                    //);
+                    KeyValuePair<string, string> keyValuePair = new KeyValuePair<string, string>(
+                        descriptionNode.QuerySelector(".ty-product-feature__label").InnerText.RemoveBreakLineTab(),
+                        descriptionNode.QuerySelector(".ty-product-feature__value").InnerText.RemoveBreakLineTab()
+                    );
+                    crawlDetailModel.Description.Add(keyValuePair);
+                }
             }
+            catch (Exception e) { };
 
             return crawlDetailModel;
         }

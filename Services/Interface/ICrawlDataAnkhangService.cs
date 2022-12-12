@@ -2,7 +2,7 @@
 
 namespace TopSoSanh.Services.Interface
 {
-    public interface ICrawlDataAnphat
+    public interface ICrawlDataAnkhangService
     {
         List<CrawlDataModel> CrawlData(string keyword);
     }

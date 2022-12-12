@@ -4,6 +4,6 @@
     {
         Anphat = 0,
         Gearvn = 1,
-        ZShop = 2
+        Ankhang = 2
     }
 }

@@ -10,21 +10,24 @@ namespace TopSoSanh.Controllers
     {
         private readonly ICrawlDataPhongVuService _crawlDataPhongVuService;
         private readonly ICrawlDataGearvnService _crawlDataGearvnService;
-        private readonly ICrawlDataAnphat _crawlDataAnphatService;
+        private readonly ICrawlDataAnphatService _crawlDataAnphatService;
         private readonly ICrawlDataZShopService _crawlDataZShopService;
+        private readonly ICrawlDataAnkhangService _crawlDataAnkhangService;
         private readonly ICrawlDataCommon _crawlDataCommon;
 
         public CrawlDataController(ICrawlDataPhongVuService crawlDataPhongVuService, 
             ICrawlDataGearvnService crawlDataGearvnService, 
-            ICrawlDataAnphat crawlDataAnphatService,
+            ICrawlDataAnphatService crawlDataAnphatService,
             ICrawlDataZShopService crawlDataZShopService,
-            ICrawlDataCommon crawlDataCommon)
+            ICrawlDataCommon crawlDataCommon, 
+            ICrawlDataAnkhangService crawlDataAnkhangService)
         {
             _crawlDataPhongVuService = crawlDataPhongVuService;
             _crawlDataGearvnService = crawlDataGearvnService;
             _crawlDataAnphatService = crawlDataAnphatService;
             _crawlDataZShopService = crawlDataZShopService;
             _crawlDataCommon = crawlDataCommon;
+            _crawlDataAnkhangService = crawlDataAnkhangService;
         }
 
         [HttpGet("Common")]
@@ -69,5 +72,12 @@ namespace TopSoSanh.Controllers
         {
             return _crawlDataZShopService.CrawlDetail(url);
         }
+
+        [HttpGet("Ankhang")]
+        public List<CrawlDataModel> getDataFromAnkhang(string keyword)
+        {
+            return _crawlDataAnkhangService.CrawlData(keyword);
+        }
+
     }
 }

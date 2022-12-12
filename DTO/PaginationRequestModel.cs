@@ -8,9 +8,10 @@
         public bool IsAscending { get; set; } = true;
         public void Format()
         {
-            if (PageNumber == 0)
+            if (PageNumber <= 0)
                 PageNumber = 1;
-            if (Quantity == 0)
+
+            if (Quantity <= 0)
                 Quantity = 20;
         }
     }
