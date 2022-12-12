@@ -34,5 +34,6 @@ namespace TopSoSanh.Extentions
             services.AddScoped<ICrawlDataCommon, CrawlDataCommon>();
             return services;
         }
+        //RecurringJob.AddOrUpdate<IOrderService>("Create_Order_Monthly_Payment", x => x.CreateOrderMonthly(), Cron.Monthly);
     }
 }
