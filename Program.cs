@@ -1,5 +1,6 @@
 using TopSoSanh.Services.Implement;
 using TopSoSanh.Services.Interface;
+using static TopSoSanh.Helper.Appsettings;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,7 +27,9 @@ builder.Services.AddScoped<ICrawlDataGearvnService, CrawlDataGearvnService>();
 builder.Services.AddScoped<ICrawlDataAnphatService, CrawlDataAnphatService>();
 builder.Services.AddScoped<ICrawlDataZShopService, CrawlDataZShopService>();
 builder.Services.AddScoped<ICrawlDataAnkhangService, CrawlDataAnkhangService>();
+builder.Services.AddScoped<ISendMailService, SendMailService>();
 builder.Services.AddScoped<ICrawlDataCommon, CrawlDataCommon>();
+builder.Configuration.Bind("MailSettings", new MailSettings());
 
 var app = builder.Build();
 

@@ -14,13 +14,15 @@ namespace TopSoSanh.Controllers
         private readonly ICrawlDataZShopService _crawlDataZShopService;
         private readonly ICrawlDataAnkhangService _crawlDataAnkhangService;
         private readonly ICrawlDataCommon _crawlDataCommon;
+        private readonly ISendMailService _sendMailService;
 
         public CrawlDataController(ICrawlDataPhongVuService crawlDataPhongVuService, 
             ICrawlDataGearvnService crawlDataGearvnService, 
             ICrawlDataAnphatService crawlDataAnphatService,
             ICrawlDataZShopService crawlDataZShopService,
             ICrawlDataCommon crawlDataCommon, 
-            ICrawlDataAnkhangService crawlDataAnkhangService)
+            ICrawlDataAnkhangService crawlDataAnkhangService, 
+            ISendMailService sendMailService)
         {
             _crawlDataPhongVuService = crawlDataPhongVuService;
             _crawlDataGearvnService = crawlDataGearvnService;
@@ -28,6 +30,7 @@ namespace TopSoSanh.Controllers
             _crawlDataZShopService = crawlDataZShopService;
             _crawlDataCommon = crawlDataCommon;
             _crawlDataAnkhangService = crawlDataAnkhangService;
+            _sendMailService = sendMailService;
         }
 
         [HttpGet("Common")]
@@ -79,5 +82,18 @@ namespace TopSoSanh.Controllers
             return _crawlDataAnkhangService.CrawlData(keyword);
         }
 
+        [HttpGet("SendDemo")]
+        public void SendDemo()
+        {
+            _sendMailService.SendMailAsync(new Helper.MailContent()
+            {
+                To = "19522232@gmail.com",
+                Subject = "Thông tin giảm giá",
+                UserName = "Long Thành",
+                ItemUrl = "https://www.ankhang.vn//ban-phim-co-logitech-game-pro-x.html",
+                ItemName = "Bàn phím cơ Logitech Game PRO X",
+                ImageUrl = "https://cdn.ankhang.vn/media/product/250_16633-ban-phim-co-logitech-game-pro-x.png"
+            });
+        }
     }
 }
