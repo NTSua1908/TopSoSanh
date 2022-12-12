@@ -87,7 +87,7 @@ namespace TopSoSanh.Controllers
         {
             _sendMailService.SendMailAsync(new Helper.MailContent()
             {
-                To = "19522232@gmail.com",
+                To = "19522232@gm.uit.edu.vn",
                 Subject = "Thông tin giảm giá",
                 UserName = "Long Thành",
                 ItemUrl = "https://www.ankhang.vn//ban-phim-co-logitech-game-pro-x.html",

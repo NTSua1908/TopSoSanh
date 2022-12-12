@@ -1,6 +1,7 @@
-using TopSoSanh.Services.Implement;
-using TopSoSanh.Services.Interface;
+using TopSoSanh.Entity;
+using Microsoft.EntityFrameworkCore;
 using static TopSoSanh.Helper.Appsettings;
+using TopSoSanh.Extentions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,28 +11,28 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddCustomDbContext(builder);
 
 builder.Services.AddCors(options =>
 {
-    options.AddDefaultPolicy(
-        builder =>
-        {
-            builder.WithOrigins("http://localhost:3000", "null")
-                                .AllowAnyHeader()
-                                .AllowAnyMethod();
-        });
+    options.AddPolicy("CorsPolicy",
+                    policy => policy.AllowAnyHeader()
+                                    .AllowAnyMethod()
+                                    .SetIsOriginAllowed(origin => true)
+                                    .AllowCredentials());
 });
 
-builder.Services.AddScoped<ICrawlDataPhongVuService, CrawlDataPhongVuService>();
-builder.Services.AddScoped<ICrawlDataGearvnService, CrawlDataGearvnService>();
-builder.Services.AddScoped<ICrawlDataAnphatService, CrawlDataAnphatService>();
-builder.Services.AddScoped<ICrawlDataZShopService, CrawlDataZShopService>();
-builder.Services.AddScoped<ICrawlDataAnkhangService, CrawlDataAnkhangService>();
-builder.Services.AddScoped<ISendMailService, SendMailService>();
-builder.Services.AddScoped<ICrawlDataCommon, CrawlDataCommon>();
-builder.Configuration.Bind("MailSettings", new MailSettings());
-
 var app = builder.Build();
+
+if (!app.Environment.IsDevelopment())
+{
+    using (var scope = app.Services.CreateScope())
+    {
+        var services = scope.ServiceProvider;
+        var context = services.GetRequiredService<ApiDbContext>();
+        context.Database.Migrate();
+    }
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment()|| app.Environment.IsProduction())
@@ -40,6 +41,7 @@ if (app.Environment.IsDevelopment()|| app.Environment.IsProduction())
     app.UseSwaggerUI();
 }
 
+app.UseCors("CorsPolicy");
 
 app.UseHttpsRedirection();
 
