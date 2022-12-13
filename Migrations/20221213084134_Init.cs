@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata;
+﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -16,8 +16,7 @@ namespace TopSoSanh.Migrations
                 name: "Products",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    Id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
                     Name = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     ItemUrl = table.Column<string>(type: "longtext", nullable: false)
@@ -35,15 +34,13 @@ namespace TopSoSanh.Migrations
                 name: "Notifications",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    ProductId = table.Column<int>(type: "int", nullable: false),
+                    Id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    ProductId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
                     Email = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     UserName = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    MaxPrice = table.Column<double>(type: "double", nullable: false),
-                    MinPrice = table.Column<double>(type: "double", nullable: false)
+                    Price = table.Column<double>(type: "double", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -61,9 +58,8 @@ namespace TopSoSanh.Migrations
                 name: "PriceFluctuations",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    ProductId = table.Column<int>(type: "int", nullable: false),
+                    Id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    ProductId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
                     Price = table.Column<double>(type: "double", nullable: false),
                     Hour = table.Column<int>(type: "int", nullable: false)
                 },

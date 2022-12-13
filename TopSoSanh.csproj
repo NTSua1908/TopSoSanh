@@ -8,7 +8,10 @@
 
   <ItemGroup>
     <PackageReference Include="Fizzler.Systems.HtmlAgilityPack" Version="1.2.1" />
-    <PackageReference Include="Hangfire.MySql.Core" Version="2.2.5" />
+    <PackageReference Include="Hangfire" Version="1.7.32" />
+    <PackageReference Include="Hangfire.AspNetCore" Version="1.7.32" />
+    <PackageReference Include="Hangfire.Core" Version="1.7.32" />
+    <PackageReference Include="Hangfire.MySqlStorage" Version="2.0.3" />
     <PackageReference Include="HtmlAgilityPack" Version="1.11.46" />
     <PackageReference Include="MailKit" Version="3.4.3" />
     <PackageReference Include="Microsoft.AspNetCore.Cors" Version="2.2.0" />

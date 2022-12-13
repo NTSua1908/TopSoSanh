@@ -6,5 +6,6 @@ namespace TopSoSanh.Services.Interface
     {
         List<CrawlDataModel> CrawlData(string keyword);
         CrawlDetailModel CrawlDetail(string url);
+        double CrawlPrice(string url);
     }
 }

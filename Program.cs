@@ -2,6 +2,8 @@ using TopSoSanh.Entity;
 using Microsoft.EntityFrameworkCore;
 using static TopSoSanh.Helper.Appsettings;
 using TopSoSanh.Extentions;
+using Hangfire;
+using System.Net;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +14,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddCustomDbContext(builder);
+builder.Services.AddHangfire(builder);
 builder.Services.RegisterApiServices();
 
 builder.Services.AddCors(options =>
@@ -46,9 +49,18 @@ app.UseCors("CorsPolicy");
 
 app.UseHttpsRedirection();
 
+app.UseHangfireDashboard();
+
 app.UseAuthorization();
 
 app.UseCors();
+
+//app.UseEndpoints(endpoints =>
+//    endpoints.MapHangfireDashboard("/hangfire", new DashboardOptions
+//    {
+//        IgnoreAntiforgeryToken = true
+//    })
+//);
 
 app.MapControllers();
 

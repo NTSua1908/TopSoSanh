@@ -1,4 +1,6 @@
-﻿using MailKit;
+﻿using Hangfire;
+using Hangfire.MySql;
+using MailKit;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
 using TopSoSanh.Entity;
@@ -32,8 +34,37 @@ namespace TopSoSanh.Extentions
             services.AddScoped<ICrawlDataAnkhangService, CrawlDataAnkhangService>();
             services.AddScoped<ISendMailService, SendMailService>();
             services.AddScoped<ICrawlDataCommon, CrawlDataCommon>();
+            services.AddScoped<IProductTrackingService, ProductTrackingService>();
             return services;
         }
         //RecurringJob.AddOrUpdate<IOrderService>("Create_Order_Monthly_Payment", x => x.CreateOrderMonthly(), Cron.Monthly);
+
+        public static IServiceCollection AddHangfire(this IServiceCollection services, WebApplicationBuilder builder)
+        {
+            services.AddHangfire(x => x
+            .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
+            .UseSimpleAssemblyNameTypeSerializer()
+            .UseRecommendedSerializerSettings()
+            .UseStorage(
+                new MySqlStorage(
+                    builder.Configuration.GetConnectionString("ApiDbConnection"),
+                    new MySqlStorageOptions
+                    {
+                        QueuePollInterval = TimeSpan.FromSeconds(30),
+                        JobExpirationCheckInterval = TimeSpan.FromHours(1),
+                        CountersAggregateInterval = TimeSpan.FromMinutes(5),
+                        PrepareSchemaIfNecessary = true,
+                        DashboardJobListLimit = 25000,
+                        TransactionTimeout = TimeSpan.FromMinutes(5),
+                        TablesPrefix = "Hangfire",
+                    } 
+                )
+            ));
+
+            // Add the processing server as IHostedService
+            services.AddHangfireServer(options => options.WorkerCount = 1);
+
+            return services;
+        }
     }
 }

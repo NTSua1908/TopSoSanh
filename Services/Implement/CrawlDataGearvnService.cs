@@ -82,5 +82,27 @@ namespace TopSoSanh.Services.Implement
             return crawlDetailModel;
         }
 
+        public double CrawlPrice(string url)
+        {
+            HtmlWeb web = new HtmlWeb();
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+            HtmlDocument doc = web.Load(url);
+            double price;
+            try
+            {
+                price = Double.Parse(
+                    doc.DocumentNode.QuerySelector(".product_sales_off > .product_sale_price")
+                    .InnerText
+                    .GetNumbers() ?? Double.MaxValue.ToString()
+                );
+            }
+            catch (Exception e)
+            {
+                price = Double.MaxValue;
+                Console.WriteLine(e.Message);
+            }
+
+            return price;
+        }
     }
 }

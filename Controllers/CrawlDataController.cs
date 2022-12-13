@@ -11,8 +11,8 @@ namespace TopSoSanh.Controllers
         private readonly ICrawlDataPhongVuService _crawlDataPhongVuService;
         private readonly ICrawlDataGearvnService _crawlDataGearvnService;
         private readonly ICrawlDataAnphatService _crawlDataAnphatService;
-        private readonly ICrawlDataZShopService _crawlDataZShopService;
         private readonly ICrawlDataAnkhangService _crawlDataAnkhangService;
+        private readonly ICrawlDataZShopService _crawlDataZShopService;
         private readonly ICrawlDataCommon _crawlDataCommon;
         private readonly ISendMailService _sendMailService;
 
