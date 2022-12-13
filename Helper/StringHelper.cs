@@ -11,11 +11,6 @@ namespace TopSoSanh.Helper
 
         public static string GetNumbers(this string input)
         {
-            //return input;
-            //Console.WriteLine(input);
-            //int indexFirstSpecialCharacter = input.RegexIndexOf(@"?!\d");
-            //if (indexFirstSpecialCharacter != -1)
-            //    input = input.Substring(0, indexFirstSpecialCharacter - 1);
             bool isDone = false;
             input = input.Trim();
             return new string(input.Where(c =>

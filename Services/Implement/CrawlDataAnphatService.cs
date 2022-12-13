@@ -45,5 +45,34 @@ namespace TopSoSanh.Services.Implement
 
             return crawlDataModels;
         }
+
+        public double CrawlPrice(string url)
+        {
+            HtmlWeb web = new HtmlWeb();
+            HtmlDocument doc = web.Load(url);
+            double price;
+            try
+            {
+                price = Double.Parse(
+                    doc.DocumentNode.QuerySelector("#price_deal_detail_2 > div.img_price_full")?
+                    .InnerText
+                    .GetNumbers() ??
+                    doc.DocumentNode.QuerySelector("#overview-left > table > tbody > tr:nth-child(2) > td:nth-child(2) > span.pro-price")?
+                    .InnerText
+                    .GetNumbers() ??
+                    doc.DocumentNode.QuerySelector("#overview-left > table > tbody > tr > td:nth-child(2) > span.pro-price")?
+                    .InnerText
+                    .GetNumbers() ??
+                    Double.MaxValue.ToString()
+                );
+            }
+            catch (Exception e)
+            {
+                price = Double.MaxValue;
+                Console.WriteLine(e.Message);
+            }
+
+            return price;
+        }
     }
 }

@@ -57,6 +57,7 @@ namespace TopSoSanh.Services.Implement
                 ProductId = product.Id,
                 UserName = model.UserName
             };
+
             _dbContext.Notifications.Add(notification);
             _dbContext.SaveChanges();
         }
@@ -64,8 +65,12 @@ namespace TopSoSanh.Services.Implement
         public void ProductTracking(string productUrl)
         {
             double newPrice = 0;
-            if (productUrl.Contains("gearvn"))
+            if (productUrl.Contains("gearvn.com"))
                 newPrice = _crawlDataGearvnService.CrawlPrice(productUrl);
+            else if (productUrl.Contains("anphatpc.com.vn"))
+                newPrice = _crawlDataAnphatService.CrawlPrice(productUrl);
+            else if (productUrl.Contains("ankhang.vn"))
+                newPrice = _crawlDataAnkhangService.CrawlPrice(productUrl);
 
             Product product = _dbContext.Products.AsNoTracking()
                     .Where(x => x.ItemUrl.ToLower().Equals(productUrl.ToLower())).First();
