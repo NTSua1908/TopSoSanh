@@ -39,6 +39,7 @@ namespace TopSoSanh.Services.Implement
                     );
                     model.ImageUrl = node.QuerySelector("a.p-img img").Attributes["data-src"]?.Value;
                     crawlDataModels.Add(model);
+                    //Console.WriteLine(CrawlPrice(model.ItemUrl));
                 }
                 catch (Exception e) { };
             }
@@ -54,15 +55,15 @@ namespace TopSoSanh.Services.Implement
             try
             {
                 price = Double.Parse(
-                    doc.DocumentNode.QuerySelector("#price_deal_detail_2 > div.img_price_full")?
-                    .InnerText
-                    .GetNumbers() ??
-                    doc.DocumentNode.QuerySelector("#overview-left > table > tbody > tr:nth-child(2) > td:nth-child(2) > span.pro-price")?
-                    .InnerText
-                    .GetNumbers() ??
-                    doc.DocumentNode.QuerySelector("#overview-left > table > tbody > tr > td:nth-child(2) > span.pro-price")?
-                    .InnerText
-                    .GetNumbers() ??
+                    doc.DocumentNode.QuerySelector("div.pro_info-price-container > table > tr:nth-child(3) > td:nth-child(2) > span > strong")?
+                .InnerText
+                .GetNumbers() ??
+                    doc.DocumentNode.QuerySelector("div.pro_info-price-container > table > tr:nth-child(2) > td:nth-child(2) > b")?
+                .InnerText
+                .GetNumbers() ??
+                doc.DocumentNode.QuerySelector("div.pro_info-price-container > table  > tr:nth-child(1) > td:nth-child(2) > b")?
+                .InnerText
+                .GetNumbers() ??
                     Double.MaxValue.ToString()
                 );
             }

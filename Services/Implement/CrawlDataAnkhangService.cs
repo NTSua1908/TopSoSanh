@@ -36,6 +36,7 @@ namespace TopSoSanh.Services.Implement
                     );
                     model.ImageUrl = node.QuerySelector("a.p-img img").Attributes["data-src"]?.Value;
                     crawlDataModels.Add(model);
+                    //Console.WriteLine(CrawlPrice(model.ItemUrl));
                 }
                 catch (Exception e) { };
             }
