@@ -9,7 +9,7 @@ namespace TopSoSanh.Entity
         public Guid Id { get; set; }
         public Guid ProductId { get; set; }
         public double Price { get; set; }
-        public int Hour { get; set; }
+        public DateTime UpdatedDate { get; set; }
         public virtual Product Product { get; set; }
     }
 }

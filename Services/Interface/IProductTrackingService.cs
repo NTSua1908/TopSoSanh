@@ -11,6 +11,6 @@ namespace TopSoSanh.Services.Interface
 
         void ProductTracking(string productUrl, string hostName);
 
-        List<double> GetTrackingResult(string productUrl);
+        List<TrackingResultModel> GetTrackingResult(string productUrl);
     }
 }

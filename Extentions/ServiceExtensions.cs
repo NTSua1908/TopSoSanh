@@ -38,7 +38,6 @@ namespace TopSoSanh.Extentions
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             return services;
         }
-        //RecurringJob.AddOrUpdate<IOrderService>("Create_Order_Monthly_Payment", x => x.CreateOrderMonthly(), Cron.Monthly);
 
         public static IServiceCollection AddHangfire(this IServiceCollection services, WebApplicationBuilder builder)
         {

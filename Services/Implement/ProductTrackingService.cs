@@ -79,7 +79,7 @@ namespace TopSoSanh.Services.Implement
             int hour = DateTime.Now.Hour;
 
             var priceFluctuation = _dbContext.PriceFluctuations
-                .Where(x => x.ProductId == product.Id && x.Hour == hour).FirstOrDefault();
+                .Where(x => x.ProductId == product.Id && x.UpdatedDate.Hour == hour).FirstOrDefault();
 
             if (priceFluctuation == null)
             {
@@ -87,11 +87,15 @@ namespace TopSoSanh.Services.Implement
                 {
                     Price = newPrice,
                     ProductId = product.Id,
-                    Hour = hour
+                    UpdatedDate = DateTime.Now
                 };
                 _dbContext.PriceFluctuations.Add(priceFluctuation);
             }
-            else priceFluctuation.Price = newPrice;
+            else
+            {
+                priceFluctuation.Price = newPrice;
+                priceFluctuation.UpdatedDate = DateTime.Now;
+            }
 
             var usersSubscribe = _dbContext.Notifications.AsNoTracking()
                 .Where(x => x.ProductId == product.Id && x.Price >= newPrice);
@@ -116,31 +120,19 @@ namespace TopSoSanh.Services.Implement
             _dbContext.SaveChanges();
         }
 
-        public List<double> GetTrackingResult(string productUrl)
+        public List<TrackingResultModel> GetTrackingResult(string productUrl)
         {
-            double[] result = _dbContext.PriceFluctuations
+            List<TrackingResultModel> result = _dbContext.PriceFluctuations
                 .Where(x => x.Product.ItemUrl == productUrl)
-                .Select(x => x.Price).ToArray();
-
-            int currentHour = DateTime.Now.Hour;
-
-            for (int i = 0; i < result.Length - 1; i++)
-            {
-                for (int j = i + 1; j < result.Length; j++)
+                .OrderBy(x => x.UpdatedDate)
+                .Select(x => new TrackingResultModel()
                 {
-                    if ((result[i] >= currentHour && result[j] > currentHour
-                        || result[i] <= currentHour && result[j] < currentHour)
-                        && result[i] > result[j]
-                        || result[i] <= currentHour && result[j] > currentHour)
-                    {
-                        double temp = result[i];
-                        result[i] = result[j];
-                        result[j] = temp;
-                    }
-                }
-            }
+                    Price = x.Price,
+                    Hour = x.UpdatedDate.Hour
+                })
+                .ToList();
 
-            return result.ToList();
+            return result;
         }
 
         public string UnSubscribeProduct(string email, string token)
