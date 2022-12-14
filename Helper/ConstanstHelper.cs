@@ -9,6 +9,7 @@
                 "<div class=\"container\">" +
                 "<h3>{2}</h3>" +
                 "<div><img src=\"{3}\" alt=\"\"></div></div>" +
+                "<p>Nhấn vào <a href='{4}'>đây</a> để hủy theo dõi sản phẩm.</p>" +
                 "<p>Cảm ơn,<br>Đội ngũ phát triển TopSoSanh.</p>";
     }
 }

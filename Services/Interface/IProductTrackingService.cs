@@ -1,13 +1,16 @@
-﻿using TopSoSanh.DTO;
+﻿using Fizzler;
+using TopSoSanh.DTO;
 
 namespace TopSoSanh.Services.Interface
 {
     public interface IProductTrackingService
     {
-        void SubscribeProduct(SubscribeProductModel model);
+        void SubscribeProduct(SubscribeProductModel model, string hostName);
 
-        void ProductTracking(string productUrl);
+        string UnSubscribeProduct(string email, string token);
 
-        List<double> GetTrackingResult(Guid productId);
+        void ProductTracking(string productUrl, string hostName);
+
+        List<double> GetTrackingResult(string productUrl);
     }
 }

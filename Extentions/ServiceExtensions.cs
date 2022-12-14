@@ -35,6 +35,7 @@ namespace TopSoSanh.Extentions
             services.AddScoped<ISendMailService, SendMailService>();
             services.AddScoped<ICrawlDataCommon, CrawlDataCommon>();
             services.AddScoped<IProductTrackingService, ProductTrackingService>();
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             return services;
         }
         //RecurringJob.AddOrUpdate<IOrderService>("Create_Order_Monthly_Payment", x => x.CreateOrderMonthly(), Cron.Monthly);

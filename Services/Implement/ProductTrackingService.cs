@@ -1,5 +1,6 @@
 ﻿using Hangfire;
 using Microsoft.EntityFrameworkCore;
+using System.Runtime.CompilerServices;
 using System.Security.Cryptography.Xml;
 using TopSoSanh.DTO;
 using TopSoSanh.Entity;
@@ -29,7 +30,7 @@ namespace TopSoSanh.Services.Implement
             _dbContext = dbContext;
         }
 
-        public void SubscribeProduct(SubscribeProductModel model)
+        public void SubscribeProduct(SubscribeProductModel model, string hostName)
         {
             Product product = _dbContext.Products
                     .Where(x => x.ItemUrl.ToLower().Equals(model.ProductUrl.ToLower())
@@ -47,7 +48,7 @@ namespace TopSoSanh.Services.Implement
                 _dbContext.Products.Add(product);
                 _dbContext.SaveChanges();
                 //add hangfire
-                RecurringJob.AddOrUpdate<IProductTrackingService>(Guid.NewGuid().ToString(), x => x.ProductTracking(product.ItemUrl), Cron.Hourly);
+                RecurringJob.AddOrUpdate<IProductTrackingService>(Guid.NewGuid().ToString(), x => x.ProductTracking(product.ItemUrl, hostName), Cron.Hourly);
             }
 
             var notification = new Notification()
@@ -62,7 +63,7 @@ namespace TopSoSanh.Services.Implement
             _dbContext.SaveChanges();
         }
 
-        public void ProductTracking(string productUrl)
+        public void ProductTracking(string productUrl, string hostName)
         {
             double newPrice = 0;
             if (productUrl.Contains("gearvn.com"))
@@ -103,7 +104,10 @@ namespace TopSoSanh.Services.Implement
                     UserName = user.UserName,
                     ItemUrl = product.ItemUrl,
                     ImageUrl = product.ImageUrl,
-                    ItemName = product.Name
+                    ItemName = product.Name,
+                    UnsubcribeUrl = "https://" + 
+                        hostName + 
+                        $"/api/ProductTracking/UnSubscribe?email={user.Email}&token={user.Id}"
                 });
             }
 
@@ -112,10 +116,10 @@ namespace TopSoSanh.Services.Implement
             _dbContext.SaveChanges();
         }
 
-        public List<double> GetTrackingResult(Guid productId)
+        public List<double> GetTrackingResult(string productUrl)
         {
             double[] result = _dbContext.PriceFluctuations
-                .Where(x => x.ProductId == productId)
+                .Where(x => x.Product.ItemUrl == productUrl)
                 .Select(x => x.Price).ToArray();
 
             int currentHour = DateTime.Now.Hour;
@@ -137,6 +141,23 @@ namespace TopSoSanh.Services.Implement
             }
 
             return result.ToList();
+        }
+
+        public string UnSubscribeProduct(string email, string token)
+        {
+            var notification = _dbContext.Notifications
+                .Where(x => x.Id.ToString() == token && x.Email == email)
+                .FirstOrDefault();
+
+            if (notification == null)
+            {
+                return "Hủy theo dõi sản phẩm KHÔNG thành công";
+            } else
+            {
+                _dbContext.Notifications.Remove(notification);
+                _dbContext.SaveChanges();
+                return "Hủy theo dõi sản phẩm thành công";
+            }
         }
     }
 }

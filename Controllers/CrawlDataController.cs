@@ -87,12 +87,13 @@ namespace TopSoSanh.Controllers
         {
             _sendMailService.SendMailAsync(new Helper.MailContent()
             {
-                To = "19522232@gm.uit.edu.vn",
+                To = "pts.uit.group@gmail.com",
                 Subject = "Thông tin giảm giá",
-                UserName = "Long Thành",
+                UserName = "Thiện Sua",
                 ItemUrl = "https://www.ankhang.vn//ban-phim-co-logitech-game-pro-x.html",
                 ItemName = "Bàn phím cơ Logitech Game PRO X",
-                ImageUrl = "https://cdn.ankhang.vn/media/product/250_16633-ban-phim-co-logitech-game-pro-x.png"
+                ImageUrl = "https://cdn.ankhang.vn/media/product/250_16633-ban-phim-co-logitech-game-pro-x.png",
+                UnsubcribeUrl = "https://localhost:7134/api/ProductTracking/UnSubscribe?email=123&token=123"
             });
         }
     }

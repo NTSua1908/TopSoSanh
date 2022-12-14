@@ -10,7 +10,7 @@ namespace TopSoSanh.Services.Implement
     {
         public async void SendMailAsync(MailContent content)
         {
-            content.Body = string.Format(ConstanstHelper.EmailContent, content.UserName, content.ItemUrl, content.ItemName, content.ImageUrl);
+            content.Body = string.Format(ConstanstHelper.EmailContent, content.UserName, content.ItemUrl, content.ItemName, content.ImageUrl, content.UnsubcribeUrl);
             await SendMail(content);
         }
         public async Task SendMail(MailContent mailContent)

@@ -10,5 +10,6 @@
         public string ItemName { get; set; }
         public string ItemUrl { get; set; }
         public string ImageUrl { get; set; }
+        public string UnsubcribeUrl { get; set; }
     }
 }
