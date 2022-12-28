@@ -7,9 +7,13 @@ namespace TopSoSanh.Services.Interface
     {
         void SubscribeProduct(SubscribeProductModel model, string hostName);
 
+        void SubscribeProductFromCustomShop(SubscribeProductCustomModel model, string hostName);
+
         string UnSubscribeProduct(string email, string token);
 
         void ProductTracking(string productUrl, string hostName);
+
+        void ProductTrackingCustom(string productUrl, string priceSelector, string hostName);
 
         List<TrackingResultModel> GetTrackingResult(string productUrl);
     }

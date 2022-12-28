@@ -14,27 +14,30 @@ namespace TopSoSanh.Services.Implement
         private readonly ICrawlDataGearvnService _crawlDataGearvnService;
         private readonly ICrawlDataAnphatService _crawlDataAnphatService;
         private readonly ICrawlDataAnkhangService _crawlDataAnkhangService;
+        private readonly ICrawlDataCustomShopService _crawlDataCustomShopService;
         private readonly ISendMailService _sendMailService;
         private readonly ApiDbContext _dbContext;
 
-        public ProductTrackingService(ICrawlDataGearvnService crawlDataGearvnService, 
-            ICrawlDataAnphatService crawlDataAnphatService, 
-            ICrawlDataAnkhangService crawlDataAnkhangService, 
-            ISendMailService sendMailService, 
+        public ProductTrackingService(ICrawlDataGearvnService crawlDataGearvnService,
+            ICrawlDataAnphatService crawlDataAnphatService,
+            ICrawlDataAnkhangService crawlDataAnkhangService,
+            ICrawlDataCustomShopService crawlDataCustomShopService,
+            ISendMailService sendMailService,
             ApiDbContext dbContext)
         {
             _crawlDataGearvnService = crawlDataGearvnService;
             _crawlDataAnphatService = crawlDataAnphatService;
             _crawlDataAnkhangService = crawlDataAnkhangService;
+            _crawlDataCustomShopService = crawlDataCustomShopService;
             _sendMailService = sendMailService;
             _dbContext = dbContext;
         }
 
         public void SubscribeProduct(SubscribeProductModel model, string hostName)
         {
-            Product product = _dbContext.Products
+            Product? product = _dbContext.Products
                     .Where(x => x.ItemUrl.ToLower().Equals(model.ProductUrl.ToLower())
-                    && x.Name.ToLower().Equals(model.ProductName.ToLower()) 
+                    && x.Name.ToLower().Equals(model.ProductName.ToLower())
                     && x.ImageUrl.ToLower().Equals(model.ImageUrl.ToLower())).AsNoTracking().FirstOrDefault();
 
             if (product == null)
@@ -50,6 +53,31 @@ namespace TopSoSanh.Services.Implement
                 //add hangfire
                 RecurringJob.AddOrUpdate<IProductTrackingService>(Guid.NewGuid().ToString(), x => x.ProductTracking(product.ItemUrl, hostName), Cron.Hourly);
             }
+
+            var notification = new Notification()
+            {
+                Email = model.Email,
+                Price = model.Price,
+                ProductId = product.Id,
+                UserName = model.UserName
+            };
+
+            _dbContext.Notifications.Add(notification);
+            _dbContext.SaveChanges();
+        }
+
+        public void SubscribeProductFromCustomShop(SubscribeProductCustomModel model, string hostName)
+        {
+            Product product = new Product()
+            {
+                ImageUrl = model.ImageUrl,
+                ItemUrl = model.ProductUrl,
+                Name = model.ProductName
+            };
+            _dbContext.Products.Add(product);
+            _dbContext.SaveChanges();
+            //add hangfire
+            RecurringJob.AddOrUpdate<IProductTrackingService>(Guid.NewGuid().ToString(), x => x.ProductTrackingCustom(product.ItemUrl, model.ProductPriceSelector, hostName), Cron.Hourly);
 
             var notification = new Notification()
             {
@@ -109,8 +137,59 @@ namespace TopSoSanh.Services.Implement
                     ItemUrl = product.ItemUrl,
                     ImageUrl = product.ImageUrl,
                     ItemName = product.Name,
-                    UnsubcribeUrl = "https://" + 
-                        hostName + 
+                    UnsubcribeUrl = "https://" +
+                        hostName +
+                        $"/api/ProductTracking/UnSubscribe?email={user.Email}&token={user.Id}"
+                });
+            }
+
+            LogHelper.LogWrite(newPrice + " " + product.ItemUrl);
+
+            _dbContext.SaveChanges();
+        }
+
+        public void ProductTrackingCustom(string productUrl, string priceSelector, string hostName)
+        {
+            double newPrice = _crawlDataCustomShopService.CrawlPrice(productUrl, priceSelector);
+
+            Product product = _dbContext.Products.AsNoTracking()
+                    .Where(x => x.ItemUrl.ToLower().Equals(productUrl.ToLower())).First();
+
+            int hour = DateTime.Now.Hour;
+
+            var priceFluctuation = _dbContext.PriceFluctuations
+                .Where(x => x.ProductId == product.Id && x.UpdatedDate.Hour == hour).FirstOrDefault();
+
+            if (priceFluctuation == null)
+            {
+                priceFluctuation = new PriceFluctuation()
+                {
+                    Price = newPrice,
+                    ProductId = product.Id,
+                    UpdatedDate = DateTime.Now
+                };
+                _dbContext.PriceFluctuations.Add(priceFluctuation);
+            }
+            else
+            {
+                priceFluctuation.Price = newPrice;
+                priceFluctuation.UpdatedDate = DateTime.Now;
+            }
+
+            var usersSubscribe = _dbContext.Notifications.AsNoTracking()
+                .Where(x => x.ProductId == product.Id && x.Price >= newPrice);
+            foreach (var user in usersSubscribe)
+            {
+                _sendMailService.SendMailAsync(new Helper.MailContent()
+                {
+                    To = user.Email,
+                    Subject = "Thông báo thông tin giảm giá",
+                    UserName = user.UserName,
+                    ItemUrl = product.ItemUrl,
+                    ImageUrl = product.ImageUrl,
+                    ItemName = product.Name,
+                    UnsubcribeUrl = "https://" +
+                        hostName +
                         $"/api/ProductTracking/UnSubscribe?email={user.Email}&token={user.Id}"
                 });
             }
@@ -144,12 +223,14 @@ namespace TopSoSanh.Services.Implement
             if (notification == null)
             {
                 return "Hủy theo dõi sản phẩm KHÔNG thành công";
-            } else
+            }
+            else
             {
                 _dbContext.Notifications.Remove(notification);
                 _dbContext.SaveChanges();
                 return "Hủy theo dõi sản phẩm thành công";
             }
         }
+
     }
 }

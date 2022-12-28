@@ -32,8 +32,9 @@ namespace TopSoSanh.Extentions
             services.AddScoped<ICrawlDataAnphatService, CrawlDataAnphatService>();
             services.AddScoped<ICrawlDataZShopService, CrawlDataZShopService>();
             services.AddScoped<ICrawlDataAnkhangService, CrawlDataAnkhangService>();
-            services.AddScoped<ISendMailService, SendMailService>();
+            services.AddScoped<ICrawlDataCustomShopService, CrawlDataCustomShopService>();
             services.AddScoped<ICrawlDataCommon, CrawlDataCommon>();
+            services.AddScoped<ISendMailService, SendMailService>();
             services.AddScoped<IProductTrackingService, ProductTrackingService>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             return services;
@@ -42,7 +43,7 @@ namespace TopSoSanh.Extentions
         public static IServiceCollection AddHangfire(this IServiceCollection services, WebApplicationBuilder builder)
         {
             services.AddHangfire(x => x
-            .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
+            .SetDataCompatibilityLevel(CompatibilityLevel.Version_110)
             .UseSimpleAssemblyNameTypeSerializer()
             .UseRecommendedSerializerSettings()
             .UseStorage(

@@ -26,6 +26,12 @@ namespace TopSoSanh.Controllers
             _productTrackingService.SubscribeProduct(model, _httpContextAccessor.HttpContext.Request.Host.Value);
         }
 
+        [HttpPost("SubscribeCustom")]
+        public void SubscribeProductTracking(SubscribeProductCustomModel model)
+        {
+            _productTrackingService.SubscribeProductFromCustomShop(model, _httpContextAccessor.HttpContext.Request.Host.Value);
+        }
+
         [HttpGet("UnSubscribe")]
         public string UnSubscribeProductTracking(string email, string token)
         {

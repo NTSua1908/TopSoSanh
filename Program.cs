@@ -4,6 +4,8 @@ using static TopSoSanh.Helper.Appsettings;
 using TopSoSanh.Extentions;
 using Hangfire;
 using System.Net;
+using Hangfire.Dashboard;
+using TopSoSanh.Helper;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -49,7 +51,14 @@ app.UseCors("CorsPolicy");
 
 app.UseHttpsRedirection();
 
-app.UseHangfireDashboard();
+var options = new DashboardOptions
+{
+    Authorization = new[]{
+        new HangfireAuthorizationFilter()
+    }
+};
+
+app.UseHangfireDashboard("/hangfire", options);
 
 app.UseAuthorization();
 

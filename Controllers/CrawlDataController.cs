@@ -12,6 +12,7 @@ namespace TopSoSanh.Controllers
         private readonly ICrawlDataGearvnService _crawlDataGearvnService;
         private readonly ICrawlDataAnphatService _crawlDataAnphatService;
         private readonly ICrawlDataAnkhangService _crawlDataAnkhangService;
+        private readonly ICrawlDataCustomShopService _crawlDataCustomShopService;
         private readonly ICrawlDataZShopService _crawlDataZShopService;
         private readonly ICrawlDataCommon _crawlDataCommon;
         private readonly ISendMailService _sendMailService;
@@ -20,6 +21,7 @@ namespace TopSoSanh.Controllers
             ICrawlDataGearvnService crawlDataGearvnService, 
             ICrawlDataAnphatService crawlDataAnphatService,
             ICrawlDataZShopService crawlDataZShopService,
+            ICrawlDataCustomShopService crawlDataCustomShopService,
             ICrawlDataCommon crawlDataCommon, 
             ICrawlDataAnkhangService crawlDataAnkhangService, 
             ISendMailService sendMailService)
@@ -28,6 +30,7 @@ namespace TopSoSanh.Controllers
             _crawlDataGearvnService = crawlDataGearvnService;
             _crawlDataAnphatService = crawlDataAnphatService;
             _crawlDataZShopService = crawlDataZShopService;
+            _crawlDataCustomShopService = crawlDataCustomShopService;
             _crawlDataCommon = crawlDataCommon;
             _crawlDataAnkhangService = crawlDataAnkhangService;
             _sendMailService = sendMailService;
@@ -62,6 +65,17 @@ namespace TopSoSanh.Controllers
         public List<CrawlDataModel> getDataFromAnphat(string keyword)
         {
             return _crawlDataAnphatService.CrawlData(keyword);
+        }
+
+        [HttpGet("TestCrawlPriceNewShop")]
+        public IActionResult TestCrawlPriceNewShop(string productUrl, string priceSelector)
+        {
+            double price = _crawlDataCustomShopService.CrawlPrice(productUrl, priceSelector);
+            if (price == Double.MaxValue)
+            {
+                return BadRequest("Không thể lấy giá sản phẩm");
+            }
+            return Ok(price);
         }
 
         [HttpGet("Zshop")]
