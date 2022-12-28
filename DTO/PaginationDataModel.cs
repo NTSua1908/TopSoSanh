@@ -20,6 +20,7 @@ namespace TopSoSanh.DTO
             IsAscending = req.IsAscending;
             TotalCount = data.Count();
             TotalPage = (int)Math.Ceiling((decimal)this.TotalCount / Quantity);
+            PageNumber = req.PageNumber;
         }
     }
 }
