@@ -199,17 +199,22 @@ namespace TopSoSanh.Services.Implement
             _dbContext.SaveChanges();
         }
 
-        public List<TrackingResultModel> GetTrackingResult(string productUrl)
+        public TrackingResultModel GetTrackingResult(string productUrl)
         {
-            List<TrackingResultModel> result = _dbContext.PriceFluctuations
+            var query = _dbContext.PriceFluctuations
                 .Where(x => x.Product.ItemUrl == productUrl)
-                .OrderBy(x => x.UpdatedDate)
-                .Select(x => new TrackingResultModel()
+                .AsNoTracking()
+                .OrderBy(x => x.UpdatedDate.Hour)
+                .Select(x => new
                 {
                     Price = x.Price,
                     Hour = x.UpdatedDate.Hour
                 })
                 .ToList();
+
+            TrackingResultModel result = new TrackingResultModel();
+            result.Hours = query.Select(x => x.Hour + ":00");
+            result.Prices = query.Select(x => x.Price);
 
             return result;
         }

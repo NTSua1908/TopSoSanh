@@ -2,7 +2,7 @@
 {
     public class TrackingResultModel
     {
-        public int Hour { get; set; }
-        public double Price { get; set; }
+        public IEnumerable<string> Hours { get; set; }
+        public IEnumerable<double> Prices { get; set; }
     }
 }

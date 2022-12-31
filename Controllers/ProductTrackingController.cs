@@ -39,7 +39,7 @@ namespace TopSoSanh.Controllers
         }
 
         [HttpGet("TrackingResult")]
-        public List<TrackingResultModel> GetTrackingResult(string productUrl)
+        public TrackingResultModel GetTrackingResult(string productUrl)
         {
             return _productTrackingService.GetTrackingResult(productUrl);
         }
