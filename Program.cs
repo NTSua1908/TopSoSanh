@@ -28,6 +28,9 @@ builder.Services.AddCors(options =>
                                     .AllowCredentials());
 });
 
+builder.Services.AddJWT(builder);
+builder.Services.AddSwagger();
+
 var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())

@@ -12,5 +12,7 @@ namespace TopSoSanh.Entity
         public string ImageUrl { get; set; }
         public virtual ICollection<Notification> Notifications { get; set; }
         public virtual ICollection<PriceFluctuation> PriceFluctuations { get; set; }
+        public virtual ICollection<Favorite> Favorites { get; set; }
+        public virtual ICollection<ProductTracking> ProductTrackings { get; set; }
     }
 }

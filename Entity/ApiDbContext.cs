@@ -27,5 +27,11 @@ namespace TopSoSanh.Entity
         public DbSet<Product> Products { get; set; }
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<PriceFluctuation> PriceFluctuations { get; set; }
+        public DbSet<User> Users { get; set; }
+        public DbSet<Role> Roles { get; set; }
+        public DbSet<UserRoleMap> UserRoleMaps { get; set; }
+        public DbSet<Favorite> Favorites { get; set; }
+        public DbSet<ProductTracking> ProductTrackings { get; set; }
+        public DbSet<Location> Locations { get; set; }
     }
 }
