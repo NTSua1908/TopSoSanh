@@ -2,6 +2,7 @@
 using Hangfire.MySql;
 using MailKit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Linq;
@@ -9,9 +10,11 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using TopSoSanh.DTO;
 using TopSoSanh.Entity;
+using TopSoSanh.Helper;
 using TopSoSanh.Services.Implement;
 using TopSoSanh.Services.Interface;
 using static TopSoSanh.Helper.Appsettings;
+using Role = TopSoSanh.Entity.Role;
 
 namespace TopSoSanh.Extentions
 {
@@ -27,6 +30,7 @@ namespace TopSoSanh.Extentions
 
             builder.Configuration.Bind("MailSettings", new MailSettings());
             builder.Configuration.Bind("JWTToken", new JWTToken());
+            builder.Configuration.Bind("DefaultAdmin", new DefaultAdmin());
 
             return services;
         }
@@ -41,8 +45,19 @@ namespace TopSoSanh.Extentions
             services.AddScoped<ICrawlDataCustomShopService, CrawlDataCustomShopService>();
             services.AddScoped<ICrawlDataCommon, CrawlDataCommon>();
             services.AddScoped<ISendMailService, SendMailService>();
+            services.AddScoped<IUserService, UserService>();
             services.AddScoped<IProductTrackingService, ProductTrackingService>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddScoped<UserResolverService>();
+
+            services.AddIdentity<User, Role>(options =>
+            {
+                options.User.RequireUniqueEmail = true;
+                options.SignIn.RequireConfirmedEmail = true;
+                options.SignIn.RequireConfirmedPhoneNumber = false;
+            })
+            .AddEntityFrameworkStores<ApiDbContext>()
+            .AddDefaultTokenProviders();
             return services;
         }
 

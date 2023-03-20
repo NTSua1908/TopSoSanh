@@ -29,10 +29,10 @@ namespace TopSoSanh.Helper
                 signingCredentials: creds
             );
 
-            return new TokenModel(new JwtSecurityTokenHandler().WriteToken(tokenProperties), tokenProperties, role);
+            return new TokenModel(new JwtSecurityTokenHandler().WriteToken(tokenProperties), tokenProperties);
         }
 
-        public static TokenModel GenerateJwtTokenWithTime(string userName, string accountId, int role, DateTime expires, bool FirstChangeProfile, Guid? PriceListId)
+        public static TokenModel GenerateJwtTokenWithTime(string userName, string accountId, int role, DateTime expires)
         {
             var claims = new List<Claim>
             {
@@ -53,7 +53,7 @@ namespace TopSoSanh.Helper
                 signingCredentials: creds
             );
 
-            return new TokenModel(new JwtSecurityTokenHandler().WriteToken(tokenProperties), tokenProperties, role);
+            return new TokenModel(new JwtSecurityTokenHandler().WriteToken(tokenProperties), tokenProperties);
         }
     }
 }

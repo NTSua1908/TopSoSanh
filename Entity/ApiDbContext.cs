@@ -1,9 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using TopSoSanh.Extentions;
 
 namespace TopSoSanh.Entity
 {
-    public class ApiDbContext : DbContext
+    public class ApiDbContext : IdentityDbContext<User, Role, string, IdentityUserClaim<string>, UserRoleMap, IdentityUserLogin<string>, IdentityRoleClaim<string>, IdentityUserToken<string>>
     {
         public ApiDbContext(DbContextOptions<ApiDbContext> options) : base(options) { }
 
@@ -21,7 +23,7 @@ namespace TopSoSanh.Entity
             //Configration relationship
             builder.ConfigrationRelationship();
             //Seed
-            //builder.Seed();
+            builder.Seed();
         }
 
         public DbSet<Product> Products { get; set; }

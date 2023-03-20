@@ -3,17 +3,20 @@ using TopSoSanh.Services.Interface;
 using MimeKit;
 using MailKit.Security;
 using static TopSoSanh.Helper.Appsettings;
+using static TopSoSanh.Helper.ConstanstHelper;
+using System.Xml.Linq;
 
 namespace TopSoSanh.Services.Implement
 {
     public class SendMailService : ISendMailService
     {
-        public async void SendMailAsync(MailContent content)
+
+        public async void SendMailTrackingAsync(MailContent content, string name, string itemName, string itemUrl, string imageUrl, string unsubscribeUrl)
         {
-            content.Body = string.Format(ConstanstHelper.EmailContent, content.UserName, content.ItemUrl, content.ItemName, content.ImageUrl, content.UnsubcribeUrl);
+            content.Body = string.Format(EmailConstant.EmailTracking, name, itemUrl, itemName, imageUrl, unsubscribeUrl);
             await SendMail(content);
         }
-        public async Task SendMail(MailContent mailContent)
+        public async Task SendMail(MailContent mailContent) 
         {
             var email = new MimeMessage();
             email.Sender = new MailboxAddress(MailSettings.DisplayName, MailSettings.Mail);
@@ -43,6 +46,19 @@ namespace TopSoSanh.Services.Implement
                 await email.WriteToAsync(emailsavefile);
             }
             smtp.Disconnect(true);
+        }
+
+        public async Task SendMailConfirmAsync(MailContent content, string hostName, string name, string token, string email)
+        {
+            var confirmationLink = @$"https://{hostName}/api/user/confirmemail?token={token}&email={email}";
+            content.Body = string.Format(EmailConstant.ConfirmEmail, name, confirmationLink);
+            await SendMail(content);
+        }
+
+        public async Task SendMailResetPassword(MailContent content, string name, string password)
+        {
+            content.Body = string.Format(EmailConstant.ResetPassword, name, password);
+            await SendMail(content);
         }
     }
 }

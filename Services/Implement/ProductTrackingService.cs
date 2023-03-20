@@ -129,18 +129,19 @@ namespace TopSoSanh.Services.Implement
                 .Where(x => x.ProductId == product.Id && x.Price >= newPrice);
             foreach (var user in usersSubscribe)
             {
-                _sendMailService.SendMailAsync(new Helper.MailContent()
-                {
-                    To = user.Email,
-                    Subject = "Thông báo thông tin giảm giá",
-                    UserName = user.UserName,
-                    ItemUrl = product.ItemUrl,
-                    ImageUrl = product.ImageUrl,
-                    ItemName = product.Name,
-                    UnsubcribeUrl = "https://" +
+                _sendMailService.SendMailTrackingAsync(new Helper.MailContent()
+                    {
+                        To = user.Email,
+                        Subject = "Thông báo thông tin giảm giá"
+                    },
+                    user.UserName,
+                    product.ItemUrl,
+                    product.ImageUrl,
+                    product.Name,
+                    "https://" +
                         hostName +
                         $"/api/ProductTracking/UnSubscribe?email={user.Email}&token={user.Id}"
-                });
+                );
             }
 
             LogHelper.LogWrite(newPrice + " " + product.ItemUrl);
@@ -180,18 +181,17 @@ namespace TopSoSanh.Services.Implement
                 .Where(x => x.ProductId == product.Id && x.Price >= newPrice);
             foreach (var user in usersSubscribe)
             {
-                _sendMailService.SendMailAsync(new Helper.MailContent()
-                {
-                    To = user.Email,
-                    Subject = "Thông báo thông tin giảm giá",
-                    UserName = user.UserName,
-                    ItemUrl = product.ItemUrl,
-                    ImageUrl = product.ImageUrl,
-                    ItemName = product.Name,
-                    UnsubcribeUrl = "https://" +
-                        hostName +
-                        $"/api/ProductTracking/UnSubscribe?email={user.Email}&token={user.Id}"
-                });
+                _sendMailService.SendMailTrackingAsync(new Helper.MailContent()
+                    {
+                        To = user.Email,
+                        Subject = "Thông báo thông tin giảm giá"
+                    },
+                    user.UserName,
+                    product.ItemUrl,
+                    product.ImageUrl,
+                    product.Name,
+                    "https://" + hostName + $"/api/ProductTracking/UnSubscribe?email={user.Email}&token={user.Id}"
+                );
             }
 
             LogHelper.LogWrite(newPrice + " " + product.ItemUrl);
