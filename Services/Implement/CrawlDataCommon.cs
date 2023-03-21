@@ -34,7 +34,21 @@ namespace TopSoSanh.Services.Implement
             else result.OrderByDescending(x => x.NewPrice);
 
             PaginationDataModel data = new PaginationDataModel(result, req);
+            GetComparision(data.Data);
             return data;
+        }
+
+        private void GetComparision(List<CrawlDataModel> result)
+        {
+            foreach (var item in result)
+            {
+                if (item.ShopName != Helper.ShopName.Anphat)
+                    item.PriceCompares.Add(_crawlDataAnphatService.GetPriceByName(item.Name));
+                if (item.ShopName != Helper.ShopName.Ankhang)
+                    item.PriceCompares.Add(_crawlDataAnkhangService.GetPriceByName(item.Name));
+                if (item.ShopName != Helper.ShopName.Gearvn)
+                    item.PriceCompares.Add(_crawlDataGearvnService.GetPriceByName(item.Name));
+            }
         }
     }
 }

@@ -82,6 +82,31 @@ namespace TopSoSanh.Services.Implement
             return crawlDetailModel;
         }
 
+        public PriceCompare GetPriceByName(string productName)
+        {
+            string link = GetLinkByProductName(productName);
+            return new PriceCompare()
+            {
+                ShopName = ShopName.Gearvn,
+                Url = link,
+                Price = string.IsNullOrEmpty(link) ? 0 : CrawlPrice(link)
+            };
+        }
+
+        private string GetLinkByProductName(string productName)
+        {
+            HtmlWeb web = new HtmlWeb();
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+            HtmlDocument doc = web.Load($"https://www.google.com/search?q=\"{productName}\"+site:https://gearvn.com/");
+            var nodeItems = doc.DocumentNode.QuerySelectorAll("#main > div:nth-child(5) a");
+            foreach (var item in nodeItems)
+            {
+                return item.Attributes["href"].Value;
+            }
+
+            return "";
+        }
+
         public double CrawlPrice(string url)
         {
             HtmlWeb web = new HtmlWeb();

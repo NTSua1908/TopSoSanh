@@ -10,8 +10,7 @@ namespace TopSoSanh.DTO
         public double OldPrice { get; set; }
         public double NewPrice { get; set; }
         public ShopName ShopName { get; set; }
-        //public double DiscountPercent { get; set; }
-        //public string Location { get; set; } = "Unknown";
+        public List<PriceCompare> PriceCompares { get; set; } = new List<PriceCompare>();
 
         public CrawlDataModel() { }
 

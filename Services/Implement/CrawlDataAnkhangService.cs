@@ -1,5 +1,6 @@
 ﻿using Fizzler.Systems.HtmlAgilityPack;
 using HtmlAgilityPack;
+using System.Net;
 using TopSoSanh.DTO;
 using TopSoSanh.Helper;
 using TopSoSanh.Services.Interface;
@@ -44,21 +45,41 @@ namespace TopSoSanh.Services.Implement
             return crawlDataModels;
         }
 
+        public PriceCompare GetPriceByName(string productName)
+        {
+            string link = GetLinkByProductName(productName);
+            return new PriceCompare()
+            {
+                ShopName = ShopName.Ankhang,
+                Url = link,
+                Price = string.IsNullOrEmpty(link) ? 0 : CrawlPrice(link)
+            };
+        }
+
+        private string GetLinkByProductName(string productName)
+        {
+            HtmlWeb web = new HtmlWeb();
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+            HtmlDocument doc = web.Load($"https://www.google.com/search?q=\"{productName}\"+site:https://www.ankhang.vn/");
+            var nodeItems = doc.DocumentNode.QuerySelectorAll("#main > div:nth-child(5) a");
+            foreach (var item in nodeItems)
+            {
+                return item.Attributes["href"].Value;
+            }
+
+            return "";
+        }
+
         public double CrawlPrice(string url)
         {
+            //url = "https://www.anphatpc.com.vn/laptop-gaming-acer-nitro-5-an515-57-53f9-nh.qensv.008.html";
             HtmlWeb web = new HtmlWeb();
             HtmlDocument doc = web.Load(url);
             double price;
             try
             {
                 price = Double.Parse(
-                    doc.DocumentNode.QuerySelector("#price_deal_detail_2 > div.img_price_full")?
-                    .InnerText
-                    .GetNumbers() ??
-                    doc.DocumentNode.QuerySelector("#overview-left > table > tbody > tr:nth-child(2) > td:nth-child(2) > span.pro-price")?
-                    .InnerText
-                    .GetNumbers() ??
-                    doc.DocumentNode.QuerySelector("#overview-left > table > tbody > tr > td:nth-child(2) > span.pro-price")?
+                    doc.DocumentNode.QuerySelector(".name_price_product_detail span.pro-price")?
                     .InnerText
                     .GetNumbers() ??
                     Double.MaxValue.ToString()
