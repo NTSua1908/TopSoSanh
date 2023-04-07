@@ -12,7 +12,7 @@
                 PageNumber = 1;
 
             if (Quantity <= 0)
-                Quantity = 20;
+                Quantity = 10;
         }
     }
 }

@@ -6,25 +6,29 @@ using TopSoSanh.Services.Interface;
 using TopSoSanh.Helper;
 using System.Reflection;
 using System.Xml.Linq;
+using System.Diagnostics;
+using static TopSoSanh.Helper.ConstanstHelper;
 
 namespace TopSoSanh.Services.Implement
 {
     public class CrawlDataGearvnService : ICrawlDataGearvnService
     {
-        public List<CrawlDataModel> CrawlData(string keyword)
+        public List<CrawlDataModel> CrawlData(string keyword, Action<CrawlDataModel> GetPriceAnKhang, Action<CrawlDataModel> GetPriceAnPhat)
         {
+            Debug.WriteLine("=====");
             List<CrawlDataModel> crawlDataModels = new List<CrawlDataModel>();
             HtmlWeb web = new HtmlWeb();
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
             HtmlDocument doc = web.Load($"https://gearvn.com/search?type=product&q=filter=((title%3Aproduct%20adjacent%20{keyword.Replace(" ", "%20")}))");
 
             var nodeItems = doc.DocumentNode.QuerySelectorAll(".product-list .product-row");
+            List<Task> tasks = new List<Task>();
 
             foreach (var node in nodeItems)
             {
                 try
                 {
-                    CrawlDataModel model = new CrawlDataModel(ShopName.Gearvn);
+                    CrawlDataModel model = new CrawlDataModel(Shop.Gearvn);
 
                     model.Name = node.QuerySelector(".product-row-name").InnerText;
                     model.OldPrice = Double.Parse(
@@ -40,9 +44,16 @@ namespace TopSoSanh.Services.Implement
                     model.ItemUrl = "https://gearvn.com" + node.QuerySelector("a").Attributes["href"].Value;
                     model.ImageUrl = "https:" + node.QuerySelector(".product-row-img .product-row-thumbnail").Attributes["src"].Value;
                     crawlDataModels.Add(model);
+                    if (crawlDataModels.Count >= CrawlConstant.Amount)
+                        break;
+                    //tasks.Add(Task.Run(() => GetPriceAnKhang(model)));
+                    //tasks.Add(Task.Run(() => GetPriceAnPhat(model)));
                 }
                 catch (Exception e) { };
             }
+
+            //Task.WaitAll(tasks.ToArray());
+            Debug.WriteLine("-----");
 
             return crawlDataModels;
         }
@@ -82,20 +93,28 @@ namespace TopSoSanh.Services.Implement
             return crawlDetailModel;
         }
 
-        public PriceCompare GetPriceByName(string productName)
+        public void GetPriceByName(CrawlDataModel model)
         {
-            string link = GetLinkByProductName(productName);
-            return new PriceCompare()
+            Debug.WriteLine("+++++++++");
+            string link = GetLinkByProductName(model.Name);
+            //link = "https://gearvn.com/products/laptop-gaming-acer-nitro-5-eagle-an515-57-53f9";
+            model.PriceCompares.Add(new PriceCompare()
             {
-                ShopName = ShopName.Gearvn,
+                Shop = Shop.Gearvn,
                 Url = link,
                 Price = string.IsNullOrEmpty(link) ? 0 : CrawlPrice(link)
-            };
+            });
+            Debug.WriteLine("********");
         }
 
         private string GetLinkByProductName(string productName)
         {
             HtmlWeb web = new HtmlWeb();
+            web.PreRequest = (request) =>
+            {
+                request.AllowAutoRedirect = true;
+                return true;
+            };
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
             HtmlDocument doc = web.Load($"https://www.google.com/search?q=\"{productName}\"+site:https://gearvn.com/");
             var nodeItems = doc.DocumentNode.QuerySelectorAll("#main > div:nth-child(5) a");

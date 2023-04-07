@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using TopSoSanh.Helper;
 
 namespace TopSoSanh.Entity
 {
@@ -10,6 +11,7 @@ namespace TopSoSanh.Entity
         public string Name { get; set; }
         public string ItemUrl { get; set; }
         public string ImageUrl { get; set; }
+        public Shop Shop { get; set; }
         public virtual ICollection<Notification> Notifications { get; set; }
         public virtual ICollection<PriceFluctuation> PriceFluctuations { get; set; }
         public virtual ICollection<Favorite> Favorites { get; set; }

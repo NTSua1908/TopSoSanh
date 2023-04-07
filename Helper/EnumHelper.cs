@@ -1,6 +1,6 @@
 ﻿namespace TopSoSanh.Helper
 {
-    public enum ShopName
+    public enum Shop
     {
         Anphat = 0,
         Gearvn = 1,

@@ -94,15 +94,23 @@ namespace TopSoSanh.Services.Implement
         public void ProductTracking(string productUrl, string hostName)
         {
             double newPrice = 0;
-            if (productUrl.Contains("gearvn.com"))
-                newPrice = _crawlDataGearvnService.CrawlPrice(productUrl);
-            else if (productUrl.Contains("anphatpc.com.vn"))
-                newPrice = _crawlDataAnphatService.CrawlPrice(productUrl);
-            else if (productUrl.Contains("ankhang.vn"))
-                newPrice = _crawlDataAnkhangService.CrawlPrice(productUrl);
-
             Product product = _dbContext.Products.AsNoTracking()
                     .Where(x => x.ItemUrl.ToLower().Equals(productUrl.ToLower())).First();
+
+            switch (product.Shop)
+            {
+                case Shop.Anphat:
+                    newPrice = _crawlDataAnphatService.CrawlPrice(productUrl);
+                    break;
+                case Shop.Gearvn:
+                    newPrice = _crawlDataGearvnService.CrawlPrice(productUrl);
+                    break;
+                case Shop.Ankhang:
+                    newPrice = _crawlDataAnkhangService.CrawlPrice(productUrl);
+                    break;
+                default:
+                    break;
+            }
 
             int hour = DateTime.Now.Hour;
 

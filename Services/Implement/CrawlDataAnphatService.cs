@@ -6,24 +6,27 @@ using TopSoSanh.Helper;
 using System.Net;
 using System;
 using Microsoft.AspNetCore.Http;
+using static TopSoSanh.Helper.ConstanstHelper;
+using System.Diagnostics;
 
 namespace TopSoSanh.Services.Implement
 {
     public class CrawlDataAnphatService : ICrawlDataAnphatService
     {
-        public List<CrawlDataModel> CrawlData(string keyword)
+        public List<CrawlDataModel> CrawlData(string keyword, Action<CrawlDataModel> GetPriceAnKhang, Action<CrawlDataModel> GetPriceGearvn)
         {
             List<CrawlDataModel> crawlDataModels = new List<CrawlDataModel>();
             HtmlWeb web = new HtmlWeb();
             HtmlDocument doc = web.Load("https://www.anphatpc.com.vn/tim?scat_id=&q=" + keyword.Replace(" ", "+"));
 
             var nodeItems = doc.DocumentNode.QuerySelectorAll(".p-list-container > .p-item");
+            List<Task> tasks = new List<Task>();
 
             foreach (var node in nodeItems)
             {
                 try
                 {
-                    CrawlDataModel model = new CrawlDataModel(ShopName.Anphat);
+                    CrawlDataModel model = new CrawlDataModel(Shop.Anphat);
 
                     model.Name = node.QuerySelector(".p-text .p-name h3").InnerText;
                     model.ItemUrl = "https://www.anphatpc.com.vn/" + node.QuerySelector(".p-text .p-name").Attributes["href"].Value;
@@ -39,23 +42,33 @@ namespace TopSoSanh.Services.Implement
                     );
                     model.ImageUrl = node.QuerySelector("a.p-img img").Attributes["data-src"]?.Value;
                     crawlDataModels.Add(model);
-                    //Console.WriteLine(CrawlPrice(model.ItemUrl));
+                    if (crawlDataModels.Count >= CrawlConstant.Amount)
+                        break;
+                    //tasks.Add(Task.Run(() => GetPriceAnKhang(model)));
+                    //tasks.Add(Task.Run(() => GetPriceGearvn(model)));
+                    //GetPriceAnKhang(model);
+                    //GetPriceGearvn(model);
                 }
                 catch (Exception e) { };
             }
 
+            //Task.WaitAll(tasks.ToArray());
+
             return crawlDataModels;
         }
 
-        public PriceCompare GetPriceByName(string productName)
+        public void GetPriceByName(CrawlDataModel model)
         {
-            string link = GetLinkByProductName(productName);
-            return new PriceCompare()
+            Debug.WriteLine("+++++++++");
+            string link = GetLinkByProductName(model.Name);
+            //link = "https://www.anphatpc.com.vn//laptop-acer-nitro-5-eagle-an515-57-54mv-nh.qensv.003-core-i5-11400h-8gb-512gb-rtx-3050-4gb-15.6-inch-fhd-win-11-den.html";
+            model.PriceCompares.Add( new PriceCompare()
             {
-                ShopName = ShopName.Anphat,
+                Shop = Shop.Anphat,
                 Url = link,
                 Price = string.IsNullOrEmpty(link) ? 0 : CrawlPrice(link)
-            };
+            });
+            Debug.WriteLine("********");
         }
 
         private string GetLinkByProductName(string productName)

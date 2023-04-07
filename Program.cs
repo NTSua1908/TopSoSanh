@@ -75,5 +75,5 @@ app.UseCors();
 //);
 
 app.MapControllers();
-
+//NetworkManagement.setIP("27.74.252.200", "255.255.240.0");
 app.Run();

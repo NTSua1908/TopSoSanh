@@ -1,27 +1,30 @@
 ﻿using Fizzler.Systems.HtmlAgilityPack;
 using HtmlAgilityPack;
+using System.Diagnostics;
 using System.Net;
 using TopSoSanh.DTO;
 using TopSoSanh.Helper;
 using TopSoSanh.Services.Interface;
+using static TopSoSanh.Helper.ConstanstHelper;
 
 namespace TopSoSanh.Services.Implement
 {
     public class CrawlDataAnkhangService : ICrawlDataAnkhangService
     {
-        public List<CrawlDataModel> CrawlData(string keyword)
+        public List<CrawlDataModel> CrawlData(string keyword, Action<CrawlDataModel> GetPriceAnPhat, Action<CrawlDataModel> GetPriceGearvn)
         {
             List<CrawlDataModel> crawlDataModels = new List<CrawlDataModel>();
             HtmlWeb web = new HtmlWeb();
             HtmlDocument doc = web.Load("https://www.ankhang.vn/tim?q=" + keyword.Replace(" ", "+"));
 
             var nodeItems = doc.DocumentNode.QuerySelectorAll(".product_list_box > .product-list li");
+            List<Task> tasks = new List<Task>();
 
             foreach (var node in nodeItems)
             {
                 try
                 {
-                    CrawlDataModel model = new CrawlDataModel(ShopName.Ankhang);
+                    CrawlDataModel model = new CrawlDataModel(Shop.Ankhang);
 
                     model.Name = node.QuerySelector(".p-name").InnerText;
                     model.ItemUrl = "https://www.ankhang.vn/" + node.QuerySelector(".p-img").Attributes["href"].Value;
@@ -37,23 +40,31 @@ namespace TopSoSanh.Services.Implement
                     );
                     model.ImageUrl = node.QuerySelector("a.p-img img").Attributes["data-src"]?.Value;
                     crawlDataModels.Add(model);
+                    if (crawlDataModels.Count >= CrawlConstant.Amount)
+                        break;
+                    //tasks.Add(Task.Run(() => GetPriceAnPhat(model)));
+                    //tasks.Add(Task.Run(() => GetPriceGearvn(model)));
                     //Console.WriteLine(CrawlPrice(model.ItemUrl));
                 }
                 catch (Exception e) { };
             }
+            //Task.WaitAll(tasks.ToArray());
 
             return crawlDataModels;
         }
 
-        public PriceCompare GetPriceByName(string productName)
+        public void GetPriceByName(CrawlDataModel model)
         {
-            string link = GetLinkByProductName(productName);
-            return new PriceCompare()
+            Debug.WriteLine("+++++++++");
+            string link = GetLinkByProductName(model.Name);
+            //link = "https://www.ankhang.vn//laptop-dell-inspiron-3520-n3520-i5u085w11blu.html";
+            model.PriceCompares.Add(new PriceCompare()
             {
-                ShopName = ShopName.Ankhang,
+                Shop = Shop.Ankhang,
                 Url = link,
                 Price = string.IsNullOrEmpty(link) ? 0 : CrawlPrice(link)
-            };
+            });
+            Debug.WriteLine("********");
         }
 
         private string GetLinkByProductName(string productName)

@@ -4,9 +4,9 @@ namespace TopSoSanh.Services.Interface
 {
     public interface ICrawlDataGearvnService
     {
-        List<CrawlDataModel> CrawlData(string keyword);
+        List<CrawlDataModel> CrawlData(string keyword, Action<CrawlDataModel> GetPriceAnKhang, Action<CrawlDataModel> GetPriceAnPhat);
         CrawlDetailModel CrawlDetail(string url);
-        PriceCompare GetPriceByName(string productName);
+        void GetPriceByName(CrawlDataModel model);
         double CrawlPrice(string url);
     }
 }

@@ -30,6 +30,11 @@
             public const string User = "1";
         }
 
+        public static class CrawlConstant
+        {
+            public const int Amount = 10;
+        }
+
         public static string GetFeDomain(IConfiguration Configuration)
         {
             return Configuration.GetSection("Domain:FeDomain").Value;

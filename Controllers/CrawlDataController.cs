@@ -52,7 +52,7 @@ namespace TopSoSanh.Controllers
         [HttpGet("Gearvn")]
         public List<CrawlDataModel> getDataFromGearVN(string keyword)
         {
-            return _crawlDataGearvnService.CrawlData(keyword);
+            return _crawlDataGearvnService.CrawlData(keyword, _crawlDataAnkhangService.GetPriceByName, _crawlDataAnphatService.GetPriceByName);
         }
 
         [HttpGet("GearvnDetail")]
@@ -64,7 +64,7 @@ namespace TopSoSanh.Controllers
         [HttpGet("AnPhat")]
         public List<CrawlDataModel> getDataFromAnphat(string keyword)
         {
-            return _crawlDataAnphatService.CrawlData(keyword);
+            return _crawlDataAnphatService.CrawlData(keyword, _crawlDataAnkhangService.GetPriceByName, _crawlDataGearvnService.GetPriceByName);
         }
 
         [HttpGet("TestCrawlPriceNewShop")]
@@ -93,7 +93,7 @@ namespace TopSoSanh.Controllers
         [HttpGet("Ankhang")]
         public List<CrawlDataModel> getDataFromAnkhang(string keyword)
         {
-            return _crawlDataAnkhangService.CrawlData(keyword);
+            return _crawlDataAnkhangService.CrawlData(keyword, _crawlDataAnphatService.GetPriceByName, _crawlDataGearvnService.GetPriceByName);
         }
 
         [HttpGet("SendDemo")]

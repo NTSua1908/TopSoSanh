@@ -9,14 +9,14 @@ namespace TopSoSanh.DTO
         public string ImageUrl { get; set; }
         public double OldPrice { get; set; }
         public double NewPrice { get; set; }
-        public ShopName ShopName { get; set; }
+        public Shop Shop { get; set; }
         public List<PriceCompare> PriceCompares { get; set; } = new List<PriceCompare>();
 
         public CrawlDataModel() { }
 
-        public CrawlDataModel(ShopName shopName)
+        public CrawlDataModel(Shop shopName)
         {
-            this.ShopName = shopName;
+            this.Shop = shopName;
         }
     }
 }
