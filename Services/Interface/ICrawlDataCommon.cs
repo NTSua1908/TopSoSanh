@@ -4,6 +4,6 @@ namespace TopSoSanh.Services.Interface
 {
     public interface ICrawlDataCommon
     {
-        PaginationDataModel getData(PaginationRequestModel req);
+        PaginationDataModel<CrawlDataModel> getData(PaginationRequestModel req);
     }
 }

@@ -47,6 +47,7 @@ namespace TopSoSanh.Extentions
             services.AddScoped<ISendMailService, SendMailService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IProductTrackingService, ProductTrackingService>();
+            services.AddScoped<ILocationService, LocationService>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddScoped<UserResolverService>();
 

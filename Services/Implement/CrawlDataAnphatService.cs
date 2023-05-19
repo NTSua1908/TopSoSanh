@@ -44,15 +44,9 @@ namespace TopSoSanh.Services.Implement
                     crawlDataModels.Add(model);
                     if (crawlDataModels.Count >= CrawlConstant.Amount)
                         break;
-                    //tasks.Add(Task.Run(() => GetPriceAnKhang(model)));
-                    //tasks.Add(Task.Run(() => GetPriceGearvn(model)));
-                    //GetPriceAnKhang(model);
-                    //GetPriceGearvn(model);
                 }
                 catch (Exception e) { };
             }
-
-            //Task.WaitAll(tasks.ToArray());
 
             return crawlDataModels;
         }

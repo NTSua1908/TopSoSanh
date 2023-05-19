@@ -71,7 +71,7 @@ namespace TopSoSanh.Services.Implement
             var user = _dbContext.Users.FirstOrDefault(x => x.Email.ToLower() == Email.ToLower());
             if (user == null)
             {
-                errors.Add(ErrorResource.UserNotFound);
+                errors.Add(String.Format(ErrorResource.NotFound, "User"));
                 return errors;
             }
             var hasher = new PasswordHasher<User>();

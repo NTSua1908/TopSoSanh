@@ -106,6 +106,15 @@ namespace TopSoSanh.Helper {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {0} was not found.
+        /// </summary>
+        public static string NotFound {
+            get {
+                return ResourceManager.GetString("NotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Old Password Incorrect.
         /// </summary>
         public static string OldPasswordIncorrect {
@@ -147,15 +156,6 @@ namespace TopSoSanh.Helper {
         public static string UsernameRequired {
             get {
                 return ResourceManager.GetString("UsernameRequired", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to User was not found.
-        /// </summary>
-        public static string UserNotFound {
-            get {
-                return ResourceManager.GetString("UserNotFound", resourceCulture);
             }
         }
     }

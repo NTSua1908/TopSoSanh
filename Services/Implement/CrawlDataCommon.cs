@@ -25,7 +25,7 @@ namespace TopSoSanh.Services.Implement
             _dbContext = dbContext;
         }
 
-        public PaginationDataModel getData(PaginationRequestModel req)
+        public PaginationDataModel<CrawlDataModel> getData(PaginationRequestModel req)
         {
             
             List<CrawlDataModel> result = new List<CrawlDataModel>();
@@ -73,7 +73,7 @@ namespace TopSoSanh.Services.Implement
                 result = result.OrderBy(x => x.NewPrice).ToList();
             else result.OrderByDescending(x => x.NewPrice);
 
-            PaginationDataModel data = new PaginationDataModel(result, req);
+            PaginationDataModel<CrawlDataModel> data = new PaginationDataModel<CrawlDataModel>(result, req);
             GetComparision(data.Data);
             return data;
         }

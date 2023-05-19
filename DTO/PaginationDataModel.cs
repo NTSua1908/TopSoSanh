@@ -2,7 +2,7 @@
 
 namespace TopSoSanh.DTO
 {
-    public class PaginationDataModel
+    public class PaginationDataModel<T>
     {
         public int PageNumber { get; set; }
         public int Quantity { get; set; }
@@ -10,9 +10,9 @@ namespace TopSoSanh.DTO
         public long TotalCount { get; set; }
         public string Keyword { get; set; }
         public bool IsAscending { get; set; }
-        public List<CrawlDataModel> Data { get; set; }
+        public List<T> Data { get; set; }
 
-        public PaginationDataModel(List<CrawlDataModel> data, PaginationRequestModel req)
+        public PaginationDataModel(List<T> data, PaginationRequestModel req)
         {
             this.Data = data.Skip((req.PageNumber-1) * req.Quantity).Take(req.Quantity).ToList();
             Quantity = req.Quantity;

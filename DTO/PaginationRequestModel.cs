@@ -6,6 +6,7 @@
         public int Quantity { get; set; }
         public string Keyword { get; set; }
         public bool IsAscending { get; set; } = true;
+        public string SearchText { get; set; }
         public void Format()
         {
             if (PageNumber <= 0)

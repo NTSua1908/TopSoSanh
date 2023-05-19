@@ -37,7 +37,7 @@ namespace TopSoSanh.Controllers
         }
 
         [HttpGet("Common")]
-        public PaginationDataModel getData([FromQuery] PaginationRequestModel req)
+        public PaginationDataModel<CrawlDataModel> getData([FromQuery] PaginationRequestModel req)
         {
             req.Format();
             return _crawlDataCommon.getData(req);

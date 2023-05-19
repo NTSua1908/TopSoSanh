@@ -102,7 +102,7 @@ namespace TopSoSanh.Controllers
             var user = await _userManager.FindByEmailAsync(email);
             if (user == null)
             {
-                errors.Add(ErrorResource.UserNotFound);
+                errors.Add(String.Format(ErrorResource.NotFound, "User"));
                 return BadRequest(errors);
             }
 

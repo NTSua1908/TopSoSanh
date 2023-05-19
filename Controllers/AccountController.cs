@@ -60,7 +60,7 @@ namespace TopSoSanh.Controllers
                 var account = await _userManager.FindByIdAsync(_userResolverService.GetUser());
                 if (account == null)
                 {
-                    errors.Add(ErrorResource.UserNotFound);
+                    errors.Add(String.Format(ErrorResource.NotFound, "User"));
                     actionResult = NotFound(errors);
                 }
                 else
