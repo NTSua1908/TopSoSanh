@@ -5,10 +5,11 @@ namespace TopSoSanh.DTO
 {
     public class LocationModel
     {
-        [Range(-90, 90)]
+        [Range(-90, 90, ErrorMessage = "Latitude is invalid")]
         public double Latitude { get; set; }
-        [Range(-180, 180)]
+        [Range(-180, 180, ErrorMessage = "Longitude is invalid")]
         public double Longitude { get; set; }
+        [Phone(ErrorMessage = "Phone number is invalid")]
         public string PhoneNumber { get; set; }
         public string Address { get; set; }
         public string Name { get; set; }

@@ -53,8 +53,8 @@ namespace TopSoSanh.Services.Implement
 
         public PaginationDataModel<LocationGetAllModel> GetAll(PaginationRequestModel req)
         {
-            var locations = _dbContext.Locations.Where(x => x.UserId == _userResolverService.GetUser());
-            if (string.IsNullOrEmpty(req.SearchText))
+            IEnumerable<Location> locations = _dbContext.Locations.Where(x => x.UserId == _userResolverService.GetUser());
+            if (!string.IsNullOrEmpty(req.SearchText))
             {
                 locations = locations.Where(x => x.Name.ToLower().Contains(req.SearchText.ToLower()) || x.Address.ToLower().Contains(req.SearchText.ToLower()));
             }
@@ -66,7 +66,7 @@ namespace TopSoSanh.Services.Implement
             location = _dbContext.Locations.Find(id);
             if (location == null)
             {
-                errors.Add(String.Format(ErrorResource.NotFound, "User"));
+                errors.Add(String.Format(ErrorResource.NotFound, "Location"));
             }
             return errors.IsEmpty;
         }

@@ -68,6 +68,7 @@ namespace TopSoSanh.Controllers
         [HttpGet("GetAll")]
         public PaginationDataModel<LocationGetAllModel> GetAll(PaginationRequestModel req)
         {
+            req.Format();
             var locations = _locationService.GetAll(req);
             return locations;
         }
