@@ -1,7 +1,5 @@
 ﻿using Hangfire;
 using Microsoft.EntityFrameworkCore;
-using System.Runtime.CompilerServices;
-using System.Security.Cryptography.Xml;
 using TopSoSanh.DTO;
 using TopSoSanh.Entity;
 using TopSoSanh.Helper;
@@ -15,30 +13,43 @@ namespace TopSoSanh.Services.Implement
         private readonly ICrawlDataAnphatService _crawlDataAnphatService;
         private readonly ICrawlDataAnkhangService _crawlDataAnkhangService;
         private readonly ICrawlDataCustomShopService _crawlDataCustomShopService;
+        private readonly IAutoOrderService _autoOrderService;
         private readonly ISendMailService _sendMailService;
+        private readonly UserResolverService _userResolverService;
         private readonly ApiDbContext _dbContext;
 
         public ProductTrackingService(ICrawlDataGearvnService crawlDataGearvnService,
             ICrawlDataAnphatService crawlDataAnphatService,
             ICrawlDataAnkhangService crawlDataAnkhangService,
             ICrawlDataCustomShopService crawlDataCustomShopService,
+            IAutoOrderService autoOrderService,
             ISendMailService sendMailService,
+            UserResolverService userResolverService,
             ApiDbContext dbContext)
         {
             _crawlDataGearvnService = crawlDataGearvnService;
             _crawlDataAnphatService = crawlDataAnphatService;
             _crawlDataAnkhangService = crawlDataAnkhangService;
             _crawlDataCustomShopService = crawlDataCustomShopService;
+            _autoOrderService = autoOrderService;
             _sendMailService = sendMailService;
+            _userResolverService = userResolverService;
             _dbContext = dbContext;
         }
 
-        public void SubscribeProduct(SubscribeProductModel model, string hostName)
+        public void SubscribeProduct(SubscribeProductModel model, string hostName, ErrorModel errors)
         {
             Product? product = _dbContext.Products
                     .Where(x => x.ItemUrl.ToLower().Equals(model.ProductUrl.ToLower())
                     && x.Name.ToLower().Equals(model.ProductName.ToLower())
                     && x.ImageUrl.ToLower().Equals(model.ImageUrl.ToLower())).AsNoTracking().FirstOrDefault();
+
+            if (model.IsAutoOrder && model.LocationId == null)
+            {
+                errors.Add(String.Format(ErrorResource.NotFound, "Location"));
+                return;
+            }
+
 
             if (product == null)
             {
@@ -46,7 +57,8 @@ namespace TopSoSanh.Services.Implement
                 {
                     ImageUrl = model.ImageUrl,
                     ItemUrl = model.ProductUrl,
-                    Name = model.ProductName
+                    Name = model.ProductName,
+                    Shop = model.ProductUrl.Contains("gearvn") ? Shop.Gearvn : model.ProductUrl.Contains("anphatpc") ? Shop.Anphat : Shop.Ankhang
                 };
                 _dbContext.Products.Add(product);
                 _dbContext.SaveChanges();
@@ -54,12 +66,27 @@ namespace TopSoSanh.Services.Implement
                 RecurringJob.AddOrUpdate<IProductTrackingService>(Guid.NewGuid().ToString(), x => x.ProductTracking(product.ItemUrl, hostName), Cron.Hourly);
             }
 
+            Location location = null;
+            if (model.LocationId.HasValue)
+            {
+                location = _dbContext.Locations.Where(x => x.Id == model.LocationId && x.UserId == _userResolverService.GetUser()).FirstOrDefault();
+            }
+
             var notification = new Notification()
             {
                 Email = model.Email,
                 Price = model.Price,
                 ProductId = product.Id,
-                UserName = model.UserName
+                UserName = model.UserName,
+                IsAutoOrder = model.IsAutoOrder,
+                UserId = _userResolverService.GetUser(),
+                Address = location?.Address,
+                District = location?.District,
+                Commune = location?.Commune,
+                Province = location?.Province,
+                OrderEmail = location?.Email,
+                OrderName = location?.Name,
+                PhoneNumber = location?.PhoneNumber
             };
 
             _dbContext.Notifications.Add(notification);
@@ -133,27 +160,52 @@ namespace TopSoSanh.Services.Implement
                 priceFluctuation.UpdatedDate = DateTime.Now;
             }
 
-            var usersSubscribe = _dbContext.Notifications.AsNoTracking()
+            var notifications = _dbContext.Notifications
                 .Where(x => x.ProductId == product.Id && x.Price >= newPrice);
-            foreach (var user in usersSubscribe)
+            foreach (var notification in notifications)
             {
-                _sendMailService.SendMailTrackingAsync(new Helper.MailContent()
+                if (!notification.IsAutoOrder)
+                {
+                    _sendMailService.SendMailTrackingAsync(
+                        new Helper.MailContent()
+                        {
+                            To = notification.Email,
+                            Subject = "Thông báo thông tin giảm giá"
+                        },
+                        notification.UserName,
+                        product.Name,
+                        product.ItemUrl,
+                        product.ImageUrl,
+                        "https://" +
+                            hostName +
+                            $"/api/ProductTracking/UnSubscribe?email={notification.Email}&token={notification.Id}"
+                    );
+                } 
+                else
+                {
+                    if ( _autoOrderService.OrderGearvn(notification, productUrl))
                     {
-                        To = user.Email,
-                        Subject = "Thông báo thông tin giảm giá"
-                    },
-                    user.UserName,
-                    product.ItemUrl,
-                    product.ImageUrl,
-                    product.Name,
-                    "https://" +
-                        hostName +
-                        $"/api/ProductTracking/UnSubscribe?email={user.Email}&token={user.Id}"
-                );
+                        _sendMailService.SendMailOrderAsync(
+                            new Helper.MailContent()
+                            {
+                                To = notification.Email,
+                                Subject = "Thông báo đặt hàng thành công"
+                            },
+                            notification.UserName,
+                            product.Name,
+                            product.ItemUrl,
+                            product.ImageUrl,
+                            "https://" +
+                                hostName +
+                                $"/api/ProductTracking/UnSubscribe?email={notification.Email}&token={notification.Id}",
+                            notification
+                        );
+                        notification.IsActive = false;
+                    }
+                }
             }
 
             LogHelper.LogWrite(newPrice + " " + product.ItemUrl);
-
             _dbContext.SaveChanges();
         }
 

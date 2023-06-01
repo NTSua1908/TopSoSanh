@@ -5,7 +5,7 @@ namespace TopSoSanh.Services.Interface
 {
     public interface IProductTrackingService
     {
-        void SubscribeProduct(SubscribeProductModel model, string hostName);
+        void SubscribeProduct(SubscribeProductModel model, string hostName, ErrorModel errors);
 
         void SubscribeProductFromCustomShop(SubscribeProductCustomModel model, string hostName);
 

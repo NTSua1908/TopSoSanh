@@ -8,6 +8,8 @@
         public string Email { get; set; }
         public string UserName { get; set; }
         public double Price { get; set; }
+        public bool IsAutoOrder { get; set; }
+        public Guid? LocationId { get; set; }
     }
 
     public class SubscribeProductCustomModel

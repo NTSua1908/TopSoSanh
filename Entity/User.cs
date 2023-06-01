@@ -11,5 +11,6 @@ namespace TopSoSanh.Entity
         public virtual ICollection<Favorite> Favorites { get; set; }
         public virtual ICollection<ProductTracking> ProductTrackings { get; set; }
         public virtual ICollection<UserRoleMap> UserRoleMaps { get; set; }
+        public virtual ICollection<Notification> Notifications { get; set; }
     }
 }

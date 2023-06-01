@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TopSoSanh.Entity;
 
@@ -10,9 +11,10 @@ using TopSoSanh.Entity;
 namespace TopSoSanh.Migrations
 {
     [DbContext(typeof(ApiDbContext))]
-    partial class ApiDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230601074211_Delete_Table_ProductTracking")]
+    partial class Delete_Table_ProductTracking
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -172,18 +174,6 @@ namespace TopSoSanh.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)");
 
-                    b.Property<string>("Address")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Commune")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("District")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("longtext");
@@ -194,33 +184,17 @@ namespace TopSoSanh.Migrations
                     b.Property<bool>("IsAutoOrder")
                         .HasColumnType("tinyint(1)");
 
-                    b.Property<Guid?>("LocationId")
+                    b.Property<Guid>("LocationId")
                         .HasColumnType("char(36)");
 
                     b.Property<int>("NotificationType")
                         .HasColumnType("int");
-
-                    b.Property<string>("OrderEmail")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("OrderName")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("PhoneNumber")
-                        .IsRequired()
-                        .HasColumnType("longtext");
 
                     b.Property<double>("Price")
                         .HasColumnType("double");
 
                     b.Property<Guid>("ProductId")
                         .HasColumnType("char(36)");
-
-                    b.Property<string>("Province")
-                        .IsRequired()
-                        .HasColumnType("longtext");
 
                     b.Property<string>("UserId")
                         .IsRequired()
@@ -351,14 +325,14 @@ namespace TopSoSanh.Migrations
                         new
                         {
                             Id = "8D04DCE2-969A-435D-BBA4-DF3F325983DC",
-                            ConcurrencyStamp = "1975dc73-bee9-4362-899e-fd1fbc9e14bf",
+                            ConcurrencyStamp = "0616ba64-c45e-482a-a9b7-265a1686224e",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
                             Id = "1B3D7E19-B1A5-4CA2-A491-54593FA16531",
-                            ConcurrencyStamp = "c4c878a0-0c2a-449b-b558-0c9d0cbda347",
+                            ConcurrencyStamp = "da5f5782-9aef-4130-8780-03be356446b8",
                             Name = "User",
                             NormalizedName = "USER"
                         });
@@ -448,7 +422,7 @@ namespace TopSoSanh.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@GMAIL.COM",
                             NormalizedUserName = "ADMIN@GMAIL.COM",
-                            PasswordHash = "AQAAAAEAACcQAAAAEKjSffZjACbh5O8uS5peCczLBXnERBH6vlLCNGwXwB1jw9z+bsvytxSMGgy+G2SDiQ==",
+                            PasswordHash = "AQAAAAEAACcQAAAAEDQo2gxEx7dz+kcAvY3LnmCCJGbQOF4G4cro7CP1fwhrW0B9y8652WbTxlPWCk69lw==",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "",
                             TwoFactorEnabled = false,
@@ -546,9 +520,11 @@ namespace TopSoSanh.Migrations
 
             modelBuilder.Entity("TopSoSanh.Entity.Notification", b =>
                 {
-                    b.HasOne("TopSoSanh.Entity.Location", null)
-                        .WithMany("Notifications")
-                        .HasForeignKey("LocationId");
+                    b.HasOne("TopSoSanh.Entity.Location", "Location")
+                        .WithMany()
+                        .HasForeignKey("LocationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("TopSoSanh.Entity.Product", "Product")
                         .WithMany("Notifications")
@@ -557,10 +533,12 @@ namespace TopSoSanh.Migrations
                         .IsRequired();
 
                     b.HasOne("TopSoSanh.Entity.User", "User")
-                        .WithMany("Notifications")
+                        .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Location");
 
                     b.Navigation("Product");
 
@@ -626,8 +604,6 @@ namespace TopSoSanh.Migrations
 
             modelBuilder.Entity("TopSoSanh.Entity.Location", b =>
                 {
-                    b.Navigation("Notifications");
-
                     b.Navigation("ProductTrackings");
                 });
 
@@ -652,8 +628,6 @@ namespace TopSoSanh.Migrations
                     b.Navigation("Favorites");
 
                     b.Navigation("Locations");
-
-                    b.Navigation("Notifications");
 
                     b.Navigation("ProductTrackings");
 

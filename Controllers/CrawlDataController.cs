@@ -96,6 +96,12 @@ namespace TopSoSanh.Controllers
             return _crawlDataAnkhangService.CrawlData(keyword, _crawlDataAnphatService.GetPriceByName, _crawlDataGearvnService.GetPriceByName);
         }
 
+        [HttpGet("Gearvn/CrawlPrice")]
+        public double GearvnCrawlPrice(string productUrl)
+        {
+            return _crawlDataGearvnService.CrawlPrice(productUrl);
+        }
+
         [HttpGet("SendDemo")]
         public void SendDemo()
         {

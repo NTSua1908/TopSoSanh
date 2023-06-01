@@ -1,13 +1,15 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TopSoSanh.DTO;
 using TopSoSanh.Services.Interface;
 
 namespace TopSoSanh.Controllers
 {
+    [Produces("application/json")]
     [Route("api/[controller]")]
-    [ApiController]
-    public class ProductTrackingController : ControllerBase
+    public class ProductTrackingController : BaseController
     {
         private readonly IProductTrackingService _productTrackingService;
 
@@ -21,18 +23,22 @@ namespace TopSoSanh.Controllers
         }
 
         [HttpPost("Subscribe")]
-        public void SubscribeProductTracking(SubscribeProductModel model)
+        [AllowAnonymous]
+        public IActionResult SubscribeProductTracking([FromBody] SubscribeProductModel model)
         {
-            _productTrackingService.SubscribeProduct(model, _httpContextAccessor.HttpContext.Request.Host.Value);
+            ErrorModel errors = new ErrorModel();
+            _productTrackingService.SubscribeProduct(model, _httpContextAccessor.HttpContext.Request.Host.Value, errors);
+            return errors.IsEmpty ? Ok() : BadRequest(errors);
         }
 
         [HttpPost("SubscribeCustom")]
-        public void SubscribeProductTracking(SubscribeProductCustomModel model)
+        public void SubscribeProductTracking([FromBody] SubscribeProductCustomModel model)
         {
             _productTrackingService.SubscribeProductFromCustomShop(model, _httpContextAccessor.HttpContext.Request.Host.Value);
         }
 
         [HttpGet("UnSubscribe")]
+        [AllowAnonymous]
         public string UnSubscribeProductTracking(string email, string token)
         {
             return _productTrackingService.UnSubscribeProduct(email, token);

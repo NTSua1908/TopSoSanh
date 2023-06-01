@@ -16,6 +16,10 @@ namespace TopSoSanh.Extentions
                 .WithMany(p => p.Notifications)
                 .HasForeignKey(n => n.ProductId)
                 .IsRequired();
+                notification.HasOne(n => n.User)
+                .WithMany(p => p.Notifications)
+                .HasForeignKey(n => n.UserId)
+                .IsRequired();
             });
             builder.Entity<PriceFluctuation>(price =>
             {

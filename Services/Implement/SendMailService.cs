@@ -1,22 +1,29 @@
-﻿using TopSoSanh.Helper;
-using TopSoSanh.Services.Interface;
+﻿using MailKit.Security;
 using MimeKit;
-using MailKit.Security;
+using TopSoSanh.Entity;
+using TopSoSanh.Helper;
+using TopSoSanh.Services.Interface;
 using static TopSoSanh.Helper.Appsettings;
 using static TopSoSanh.Helper.ConstanstHelper;
-using System.Xml.Linq;
 
 namespace TopSoSanh.Services.Implement
 {
     public class SendMailService : ISendMailService
     {
-
         public async void SendMailTrackingAsync(MailContent content, string name, string itemName, string itemUrl, string imageUrl, string unsubscribeUrl)
         {
             content.Body = string.Format(EmailConstant.EmailTracking, name, itemUrl, itemName, imageUrl, unsubscribeUrl);
             await SendMail(content);
         }
-        public async Task SendMail(MailContent mailContent) 
+
+        public async void SendMailOrderAsync(MailContent content, string name, string itemName, string itemUrl, string imageUrl, string unsubscribeUrl, Notification notification)
+        {
+            string[] address = new string[] { notification.Address, notification.Commune, notification.District, notification.Province };
+            content.Body = string.Format(EmailConstant.ConfirmOrder, name, itemUrl, notification.OrderName, notification.OrderEmail, notification.PhoneNumber, String.Join(", ", address), itemName, imageUrl, unsubscribeUrl);
+            await SendMail(content);
+        }
+
+        private async Task SendMail(MailContent mailContent) 
         {
             var email = new MimeMessage();
             email.Sender = new MailboxAddress(MailSettings.DisplayName, MailSettings.Mail);
@@ -50,7 +57,7 @@ namespace TopSoSanh.Services.Implement
 
         public async Task SendMailConfirmAsync(MailContent content, string hostName, string name, string token, string email)
         {
-            var confirmationLink = @$"https://{hostName}/api/user/confirmemail?token={token}&email={email}";
+            var confirmationLink = @$"https://{hostName}/api/auth/confirmemail?token={token}&email={email}";
             content.Body = string.Format(EmailConstant.ConfirmEmail, name, confirmationLink);
             await SendMail(content);
         }

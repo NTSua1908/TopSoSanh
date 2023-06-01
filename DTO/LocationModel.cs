@@ -5,46 +5,58 @@ namespace TopSoSanh.DTO
 {
     public class LocationModel
     {
-        [Range(-90, 90, ErrorMessage = "Latitude is invalid")]
-        public double Latitude { get; set; }
-        [Range(-180, 180, ErrorMessage = "Longitude is invalid")]
-        public double Longitude { get; set; }
+        [Required(ErrorMessage = "Province is required")]
+        public string Province { get; set; }
+        [Required(ErrorMessage = "District is required")]
+        public string District { get; set; }
+        [Required(ErrorMessage = "Commune is required")]
+        public string Commune { get; set; }
+        [Required(ErrorMessage = "Address is required")]
+        public string Address { get; set; }
         [Phone(ErrorMessage = "Phone number is invalid")]
         public string PhoneNumber { get; set; }
-        public string Address { get; set; }
+        [EmailAddress]
+        public string Email { get; set; }
+        [Required(ErrorMessage = "Name is required")]
         public string Name { get; set; }
 
         public LocationModel() { }
 
         public LocationModel(Location location)
         {
-            Latitude = location.Latitude;
-            Longitude = location.Longitude;
-            PhoneNumber = location.PhoneNumber;
-            Name = location.Name;
+            Province = location.Province;
+            District = location.District;
+            Commune = location.Commune;
             Address = location.Address;
+            PhoneNumber = location.PhoneNumber;
+            Email = location.Email;
+            Name = location.Name;
         }
 
         public Location ParseToEntity(string userId)
         {
             return new Location()
             {
-                Latitude = Latitude,
-                Longitude = Longitude,
-                PhoneNumber = PhoneNumber,
-                Name = Name,
+                Province = Province,
+                District = District,
+                Commune = Commune,
                 Address = Address,
+                PhoneNumber = PhoneNumber,
+                Email = Email,
+                Name = Name,
                 UserId = userId
             };
         }
 
         public void UpdateEntity(Location location)
         {
-            location.Latitude = Latitude;
-            location.Longitude = Longitude;
-            location.PhoneNumber = PhoneNumber;
-            location.Name = Name;
+            location.Province = Province;
+            location.District = District;
+            location.Commune = Commune;
             location.Address = Address;
+            location.PhoneNumber = PhoneNumber;
+            location.Email = Email;
+            location.Name = Name;
         }
     }
 
