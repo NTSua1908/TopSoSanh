@@ -166,24 +166,27 @@ namespace TopSoSanh.Services.Implement
             {
                 if (!notification.IsAutoOrder)
                 {
-                    _sendMailService.SendMailTrackingAsync(
-                        new Helper.MailContent()
-                        {
-                            To = notification.Email,
-                            Subject = "Thông báo thông tin giảm giá"
-                        },
-                        notification.UserName,
-                        product.Name,
-                        product.ItemUrl,
-                        product.ImageUrl,
-                        "https://" +
-                            hostName +
-                            $"/api/ProductTracking/UnSubscribe?email={notification.Email}&token={notification.Id}"
-                    );
+                    if (notification.IsActive)
+                    {
+                        _sendMailService.SendMailTrackingAsync(
+                            new Helper.MailContent()
+                            {
+                                To = notification.Email,
+                                Subject = "Thông báo thông tin giảm giá"
+                            },
+                            notification.UserName,
+                            product.Name,
+                            product.ItemUrl,
+                            product.ImageUrl,
+                            "https://" +
+                                hostName +
+                                $"/api/ProductTracking/UnSubscribe?email={notification.Email}&token={notification.Id}"
+                        );
+                    }
                 } 
                 else
                 {
-                    if ( _autoOrderService.OrderGearvn(notification, productUrl))
+                    if (notification.IsActive && _autoOrderService.OrderGearvn(notification, productUrl))
                     {
                         _sendMailService.SendMailOrderAsync(
                             new Helper.MailContent()
@@ -297,5 +300,16 @@ namespace TopSoSanh.Services.Implement
             }
         }
 
+        public void ToggleNotification(Guid notificationId, ErrorModel errors)
+        {
+            var notification = _dbContext.Notifications.Where(x => x.Id == notificationId && x.UserId == _userResolverService.GetUser()).FirstOrDefault();
+            if (notification == null)
+            {
+                errors.Add(string.Format(ErrorResource.NotFound, "Notification"));
+                return;
+            }
+            notification.IsActive = !notification.IsActive;
+            _dbContext.SaveChanges();
+        }
     }
 }

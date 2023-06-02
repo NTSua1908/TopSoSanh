@@ -33,7 +33,6 @@ namespace TopSoSanh.Entity
         public DbSet<Role> Roles { get; set; }
         public DbSet<UserRoleMap> UserRoleMaps { get; set; }
         public DbSet<Favorite> Favorites { get; set; }
-        public DbSet<ProductTracking> ProductTrackings { get; set; }
         public DbSet<Location> Locations { get; set; }
     }
 }

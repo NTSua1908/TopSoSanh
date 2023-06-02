@@ -12,10 +12,4 @@
         Admin = 0,
         User = 1
     }
-
-    public enum NotificationType
-    {
-        Discount = 0,
-        Order = 1
-    }
 }
