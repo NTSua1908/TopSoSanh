@@ -50,12 +50,8 @@ namespace TopSoSanh.Controllers
             return _productTrackingService.GetTrackingResult(productUrl);
         }
 
-        [HttpGet("ToggleNotification/notificationId")]
-        public IActionResult ToggleActiveNotification(Guid notificationId)
-        {
-            ErrorModel errors = new ErrorModel();
-            _productTrackingService.ToggleNotification(notificationId, errors);
-            return errors.IsEmpty ? Ok() : BadRequest(errors);
-        }
+        
+
+
     }
 }

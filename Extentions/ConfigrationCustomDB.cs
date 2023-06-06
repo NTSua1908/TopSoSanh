@@ -62,24 +62,6 @@ namespace TopSoSanh.Extentions
                     .HasForeignKey(ur => ur.UserId)
                     .IsRequired();
             });
-
-            builder.Entity<ProductTracking>(productTracking =>
-            {
-                productTracking.HasOne(ur => ur.Product)
-                    .WithMany(r => r.ProductTrackings)
-                    .HasForeignKey(ur => ur.ProductId)
-                    .IsRequired();
-
-                productTracking.HasOne(ur => ur.User)
-                    .WithMany(r => r.ProductTrackings)
-                    .HasForeignKey(ur => ur.UserId)
-                    .IsRequired();
-
-                productTracking.HasOne(ur => ur.Location)
-                    .WithMany(r => r.ProductTrackings)
-                    .HasForeignKey(ur => ur.LocationId)
-                    .IsRequired();
-            });
         }
 
         public static void Seed(this ModelBuilder builder)

@@ -16,7 +16,5 @@ namespace TopSoSanh.Services.Interface
         void ProductTrackingCustom(string productUrl, string priceSelector, string hostName);
 
         TrackingResultModel GetTrackingResult(string productUrl);
-
-        void ToggleNotification(Guid notificationId, ErrorModel errors);
     }
 }

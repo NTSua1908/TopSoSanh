@@ -300,16 +300,6 @@ namespace TopSoSanh.Services.Implement
             }
         }
 
-        public void ToggleNotification(Guid notificationId, ErrorModel errors)
-        {
-            var notification = _dbContext.Notifications.Where(x => x.Id == notificationId && x.UserId == _userResolverService.GetUser()).FirstOrDefault();
-            if (notification == null)
-            {
-                errors.Add(string.Format(ErrorResource.NotFound, "Notification"));
-                return;
-            }
-            notification.IsActive = !notification.IsActive;
-            _dbContext.SaveChanges();
-        }
+        
     }
 }

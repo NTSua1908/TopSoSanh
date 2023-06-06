@@ -9,7 +9,6 @@ namespace TopSoSanh.Entity
         public string LastName { get; set; }
         public virtual ICollection<Location> Locations { get; set; }
         public virtual ICollection<Favorite> Favorites { get; set; }
-        public virtual ICollection<ProductTracking> ProductTrackings { get; set; }
         public virtual ICollection<UserRoleMap> UserRoleMaps { get; set; }
         public virtual ICollection<Notification> Notifications { get; set; }
     }
