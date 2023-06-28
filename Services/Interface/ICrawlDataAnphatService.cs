@@ -6,6 +6,8 @@ namespace TopSoSanh.Services.Interface
     {
         List<CrawlDataModel> CrawlData(string keyword, Action<CrawlDataModel> GetPriceAnKhang, Action<CrawlDataModel> GetPriceGearvn);
         void GetPriceByName(CrawlDataModel model);
-        double CrawlPrice(string url);
+        void GetPriceByName(string productName, List<PriceCompare> priceCompares);
+
+		double CrawlPrice(string url);
     }
 }

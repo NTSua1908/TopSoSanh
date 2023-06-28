@@ -55,7 +55,6 @@ namespace TopSoSanh.Services.Implement
 
         public void GetPriceByName(CrawlDataModel model)
         {
-            Debug.WriteLine("+++++++++");
             string link = GetLinkByProductName(model.Name);
             //link = "https://www.ankhang.vn//laptop-dell-inspiron-3520-n3520-i5u085w11blu.html";
             model.PriceCompares.Add(new PriceCompare()
@@ -64,10 +63,20 @@ namespace TopSoSanh.Services.Implement
                 Url = link,
                 Price = string.IsNullOrEmpty(link) ? 0 : CrawlPrice(link)
             });
-            Debug.WriteLine("********");
         }
 
-        private string GetLinkByProductName(string productName)
+		public void GetPriceByName(string productName, List<PriceCompare> priceCompares)
+		{
+			string link = GetLinkByProductName(productName);
+			priceCompares.Add(new PriceCompare()
+			{
+				Shop = Shop.Anphat,
+				Url = link,
+				Price = string.IsNullOrEmpty(link) ? 0 : CrawlPrice(link)
+			});
+		}
+
+		private string GetLinkByProductName(string productName)
         {
             HtmlWeb web = new HtmlWeb();
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
@@ -93,7 +102,11 @@ namespace TopSoSanh.Services.Implement
                     doc.DocumentNode.QuerySelector(".name_price_product_detail span.pro-price")?
                     .InnerText
                     .GetNumbers() ??
-                    Double.MaxValue.ToString()
+					doc.DocumentNode.QuerySelector("#price_deal_detail_2 .img_price_full")?
+					.InnerText
+					.GetNumbers()
+                    ??
+					Double.MaxValue.ToString()
                 );
             }
             catch (Exception e)

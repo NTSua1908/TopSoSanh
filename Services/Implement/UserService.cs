@@ -1,7 +1,5 @@
-﻿using Hangfire;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Configuration;
-using System;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using TopSoSanh.DTO;
 using TopSoSanh.DTO.User;
 using TopSoSanh.Entity;
@@ -11,21 +9,23 @@ using Role = TopSoSanh.Entity.Role;
 
 namespace TopSoSanh.Services.Implement
 {
-    public class UserService : IUserService
+	public class UserService : IUserService
     {
 
         private readonly UserManager<User> _userManager;
         private readonly ApiDbContext _dbContext;
         private readonly RoleManager<Role> _roleManager;
         private readonly ISendMailService _sendMailService;
+        private readonly UserResolverService _userResolverService;
 
         public UserService(UserManager<User> userManager, ApiDbContext context, RoleManager<Role> roleManager, 
-            ISendMailService sendMailService)
+            ISendMailService sendMailService, UserResolverService userResolverService)
         {
             _userManager = userManager;
             _dbContext = context;
             _roleManager = roleManager;
             _sendMailService = sendMailService;
+            _userResolverService = userResolverService;
         }
 
         public async Task<ErrorModel> Register(RegisterModel model, string hostName)
@@ -86,7 +86,66 @@ namespace TopSoSanh.Services.Implement
             return errors;
         }
 
-        private string RandomString(int length)
+		public void AddFavorite(ProductModel product)
+        {
+            var favoriteProduct = _dbContext.Products.FirstOrDefault(x => x.ItemUrl == product.ProductUrl);
+
+			if (favoriteProduct == null)
+            {
+                favoriteProduct = new Product()
+                {
+                    ImageUrl = product.ImageUrl,
+                    Name = product.ProductName,
+                    ItemUrl = product.ProductUrl,
+                    Shop = product.Shop
+                };
+                _dbContext.Products.Add(favoriteProduct);
+                _dbContext.SaveChanges();
+			}
+            else if (_dbContext.Favorites.Any(x => x.UserId == _userResolverService.GetUser() && x.ProductId == favoriteProduct.Id))
+            {
+                return;
+            }
+			_dbContext.Favorites.Add(new Favorite()
+			{
+				ProductId = favoriteProduct.Id,
+				UserId = _userResolverService.GetUser()
+			});
+			_dbContext.SaveChanges();
+		}
+
+		public void RemoveFavorite(string productUrl, ErrorModel errors)
+        {
+			var product = _dbContext.Products.FirstOrDefault(x => x.ItemUrl == productUrl);
+
+			if (product == null)
+			{
+                errors.Add(String.Format(ErrorResource.NotFound, "Product"));
+                return;
+			}
+            var favorite = _dbContext.Favorites.FirstOrDefault(x => x.UserId == _userResolverService.GetUser() && x.ProductId == product.Id);
+			if (favorite == null)
+			{
+				errors.Add(String.Format(ErrorResource.NotFound, "Favorite product"));
+				return;
+			}
+
+			_dbContext.Favorites.Remove(favorite);
+			_dbContext.SaveChanges();
+		}
+
+        public PaginationDataModel<ProductModel> GetFavoriteProductByToken(PaginationRequestModel req)
+        {
+            var favorites = _dbContext.Favorites.Where(x => x.UserId == _userResolverService.GetUser())
+                                                .Include(x => x.Product).AsEnumerable();
+            if (!string.IsNullOrEmpty(req.SearchText))
+            {
+                favorites = favorites.Where(x => x.Product.Name.ToLower().Contains(req.SearchText.ToLower()));
+            }
+            return new PaginationDataModel<ProductModel>(favorites.Select(x => new ProductModel(x.Product)).ToList(), req);
+        }
+
+		private string RandomString(int length)
         {
             Random random = new Random();
             const string chars = "abcdefghijklmnopqrstuvxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";

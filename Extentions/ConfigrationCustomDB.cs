@@ -8,7 +8,7 @@ namespace TopSoSanh.Extentions
 {
     public static class ConfigrationCustomDB
     {
-        public static void ConfigrationRelationship(this ModelBuilder builder)
+        public static void ConfigurationRelationship(this ModelBuilder builder)
         {
             builder.Entity<Notification>(notification =>
             {

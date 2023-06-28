@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using TopSoSanh.DTO;
+using TopSoSanh.Helper;
 using TopSoSanh.Services.Interface;
 
 namespace TopSoSanh.Controllers
@@ -43,13 +44,19 @@ namespace TopSoSanh.Controllers
             return _crawlDataCommon.getData(req);
         }
 
-        //[HttpGet("phongvu")]
-        //public async Task<List<CrawlDataModel>> getDataFromPhongVu(string keyword)
-        //{
-        //    return await _crawlDataPhongVuService.CrawlData(keyword);
-        //}
+        [HttpGet("GetPriceOtherShop")]
+        public List<PriceCompare> PriceCompares(string productName, Shop shop)
+        {
+            return _crawlDataCommon.GetPriceOtherShop(productName, shop);
+        }
 
-        [HttpGet("Gearvn")]
+		//[HttpGet("phongvu")]
+		//public async Task<List<CrawlDataModel>> getDataFromPhongVu(string keyword)
+		//{
+		//    return await _crawlDataPhongVuService.CrawlData(keyword);
+		//}
+
+		[HttpGet("Gearvn")]
         public List<CrawlDataModel> getDataFromGearVN(string keyword)
         {
             return _crawlDataGearvnService.CrawlData(keyword, _crawlDataAnkhangService.GetPriceByName, _crawlDataAnphatService.GetPriceByName);

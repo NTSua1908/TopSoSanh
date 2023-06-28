@@ -15,13 +15,12 @@ namespace TopSoSanh.Services.Implement
     {
         public List<CrawlDataModel> CrawlData(string keyword, Action<CrawlDataModel> GetPriceAnKhang, Action<CrawlDataModel> GetPriceAnPhat)
         {
-            Debug.WriteLine("=====");
             List<CrawlDataModel> crawlDataModels = new List<CrawlDataModel>();
             HtmlWeb web = new HtmlWeb();
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
             HtmlDocument doc = web.Load($"https://gearvn.com/search?type=product&q=filter=((title%3Aproduct%20adjacent%20{keyword.Replace(" ", "%20")}))");
 
-            var nodeItems = doc.DocumentNode.QuerySelectorAll(".product-list .product-row");
+            var nodeItems = doc.DocumentNode.QuerySelectorAll(".search-list-results > .proloop");
             List<Task> tasks = new List<Task>();
 
             foreach (var node in nodeItems)
@@ -30,19 +29,22 @@ namespace TopSoSanh.Services.Implement
                 {
                     CrawlDataModel model = new CrawlDataModel(Shop.Gearvn);
 
-                    model.Name = node.QuerySelector(".product-row-name").InnerText;
+                    model.Name = node.QuerySelector(".proloop-name a").InnerText;
                     model.OldPrice = Double.Parse(
-                        node.QuerySelector(".product-row-price > del")?
+                        node.QuerySelector(".proloop-price  del")?
                         .InnerText
                         .GetNumbers() ?? "0"
                     );
-                    model.NewPrice = Double.Parse(
-                        node.QuerySelector(".product-row-price > .product-row-sale")
+                    model.NewPrice = node.QuerySelector(".proloop-price .proloop-price--highlight") != null ? Double.Parse(
+                        node.QuerySelector(".proloop-price .proloop-price--highlight")
                         .InnerText
-                        .GetNumbers()
-                    );
+                        .GetNumbers()) :
+						Double.Parse(
+						node.QuerySelector(".proloop-price .proloop-price--normal")
+						.InnerText
+						.GetNumbers());
                     model.ItemUrl = "https://gearvn.com" + node.QuerySelector("a").Attributes["href"].Value;
-                    model.ImageUrl = "https:" + node.QuerySelector(".product-row-img .product-row-thumbnail").Attributes["src"].Value;
+                    model.ImageUrl = "https:" + node.QuerySelector("picture > img.img-default").Attributes["data-src"].Value;
                     crawlDataModels.Add(model);
                     if (crawlDataModels.Count >= CrawlConstant.Amount)
                         break;
@@ -53,7 +55,6 @@ namespace TopSoSanh.Services.Implement
             }
 
             //Task.WaitAll(tasks.ToArray());
-            Debug.WriteLine("-----");
 
             return crawlDataModels;
         }
@@ -95,7 +96,6 @@ namespace TopSoSanh.Services.Implement
 
         public void GetPriceByName(CrawlDataModel model)
         {
-            Debug.WriteLine("+++++++++");
             string link = GetLinkByProductName(model.Name);
             //link = "https://gearvn.com/products/laptop-gaming-acer-nitro-5-eagle-an515-57-53f9";
             model.PriceCompares.Add(new PriceCompare()
@@ -104,10 +104,20 @@ namespace TopSoSanh.Services.Implement
                 Url = link,
                 Price = string.IsNullOrEmpty(link) ? 0 : CrawlPrice(link)
             });
-            Debug.WriteLine("********");
         }
 
-        private string GetLinkByProductName(string productName)
+		public void GetPriceByName(string productName, List<PriceCompare> priceCompares)
+		{
+			string link = GetLinkByProductName(productName);
+			priceCompares.Add(new PriceCompare()
+			{
+				Shop = Shop.Anphat,
+				Url = link,
+				Price = string.IsNullOrEmpty(link) ? 0 : CrawlPrice(link)
+			});
+		}
+
+		private string GetLinkByProductName(string productName)
         {
             HtmlWeb web = new HtmlWeb();
             web.PreRequest = (request) =>
@@ -134,15 +144,20 @@ namespace TopSoSanh.Services.Implement
             double price;
             try
             {
-                price = Double.Parse(
-                    doc.DocumentNode.QuerySelector(".product_sales_off > .product_sale_price")
-                    .InnerText
-                    .GetNumbers() ?? Double.MaxValue.ToString()
-                );
+                if (doc.DocumentNode.QuerySelector(".proloop-img > a") != null)
+                {
+                    string redirectUrl = "https://gearvn.com" + doc.DocumentNode.QuerySelector(".proloop-img > a").Attributes["href"].Value;
+                    doc = web.Load(redirectUrl);
+                }
+				price = Double.Parse(
+                        doc.DocumentNode.QuerySelector(".product-price .pro-price")
+                        .InnerText
+                        .GetNumbers());
+
             }
             catch (Exception e)
             {
-                price = Double.MaxValue;
+                price = 0;
                 Console.WriteLine(e.Message);
             }
 

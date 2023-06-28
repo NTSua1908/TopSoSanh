@@ -20,8 +20,8 @@ namespace TopSoSanh.Entity
             // Add your customizations after calling base.OnModelCreating(builder);
             base.OnModelCreating(builder);
 
-            //Configration relationship
-            builder.ConfigrationRelationship();
+            //Configuration relationship
+            builder.ConfigurationRelationship();
             //Seed
             builder.Seed();
         }

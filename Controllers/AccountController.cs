@@ -1,40 +1,30 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using TopSoSanh.DTO.User;
 using TopSoSanh.DTO;
+using TopSoSanh.DTO.User;
 using TopSoSanh.Entity;
 using TopSoSanh.Helper;
 using TopSoSanh.Services.Interface;
-using Role = TopSoSanh.Helper.Role;
 using static TopSoSanh.Helper.ConstanstHelper;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.EntityFrameworkCore;
-using System;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace TopSoSanh.Controllers
 {
-    [Produces("application/json")]
+	[Produces("application/json")]
     [Route("api/[controller]")]
-    public class AccountController : BaseController
+	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+	public class AccountController : BaseController
     {
         private readonly IUserService _userService;
-        private readonly SignInManager<User> _signInManager;
         private readonly UserManager<User> _userManager;
         private readonly UserResolverService _userResolverService;
-        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public AccountController(IUserService userService, SignInManager<User> signInManager, UserManager<User> userManager, UserResolverService userResolverService, IHttpContextAccessor httpContextAccessor)
+        public AccountController(IUserService userService, UserManager<User> userManager, UserResolverService userResolverService)
         {
             _userService = userService;
-            _signInManager = signInManager;
             _userManager = userManager;
             _userResolverService = userResolverService;
-            _httpContextAccessor = httpContextAccessor;
         }
 
         [HttpPost("Create")]
@@ -79,5 +69,27 @@ namespace TopSoSanh.Controllers
             }
             return actionResult;
         }
-    }
+
+        [HttpPost("AddFavorite")]
+        public IActionResult AddFavorite([FromBody] ProductModel product)
+        {
+            _userService.AddFavorite(product);
+            return Ok();
+        }
+
+		[HttpPost("RemoveFavorite")]
+		public IActionResult RemoveFavorite([FromBody] string productUrl)
+		{
+            ErrorModel errors = new ErrorModel();
+			_userService.RemoveFavorite(productUrl, errors);
+			return errors.IsEmpty ? Ok() : BadRequest(errors);
+		}
+
+        [HttpGet("GetFavoriteProductByToken")]
+        public PaginationDataModel<ProductModel> GetFavoriteProductByToken(PaginationRequestModel req)
+        {
+            req.Format();
+            return _userService.GetFavoriteProductByToken(req);
+        }
+	}
 }

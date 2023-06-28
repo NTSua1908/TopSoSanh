@@ -53,7 +53,6 @@ namespace TopSoSanh.Services.Implement
 
         public void GetPriceByName(CrawlDataModel model)
         {
-            Debug.WriteLine("+++++++++");
             string link = GetLinkByProductName(model.Name);
             //link = "https://www.anphatpc.com.vn//laptop-acer-nitro-5-eagle-an515-57-54mv-nh.qensv.003-core-i5-11400h-8gb-512gb-rtx-3050-4gb-15.6-inch-fhd-win-11-den.html";
             model.PriceCompares.Add( new PriceCompare()
@@ -62,10 +61,20 @@ namespace TopSoSanh.Services.Implement
                 Url = link,
                 Price = string.IsNullOrEmpty(link) ? 0 : CrawlPrice(link)
             });
-            Debug.WriteLine("********");
         }
 
-        private string GetLinkByProductName(string productName)
+		public void GetPriceByName(string productName, List<PriceCompare> priceCompares)
+		{
+			string link = GetLinkByProductName(productName);
+            priceCompares.Add(new PriceCompare()
+            {
+                Shop = Shop.Anphat,
+                Url = link,
+                Price = string.IsNullOrEmpty(link) ? 0 : CrawlPrice(link)
+            });
+		}
+
+		private string GetLinkByProductName(string productName)
         {
             HtmlWeb web = new HtmlWeb();
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
