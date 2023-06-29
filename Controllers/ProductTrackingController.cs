@@ -9,6 +9,7 @@ namespace TopSoSanh.Controllers
 {
     [Produces("application/json")]
     [Route("api/[controller]")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class ProductTrackingController : BaseController
     {
         private readonly IProductTrackingService _productTrackingService;
@@ -23,7 +24,6 @@ namespace TopSoSanh.Controllers
         }
 
         [HttpPost("Subscribe")]
-        [AllowAnonymous]
         public IActionResult SubscribeProductTracking([FromBody] SubscribeProductModel model)
         {
             ErrorModel errors = new ErrorModel();
@@ -49,9 +49,5 @@ namespace TopSoSanh.Controllers
         {
             return _productTrackingService.GetTrackingResult(productUrl);
         }
-
-        
-
-
     }
 }

@@ -44,7 +44,13 @@ namespace TopSoSanh.Services.Implement
                     && x.Name.ToLower().Equals(model.ProductName.ToLower())
                     && x.ImageUrl.ToLower().Equals(model.ImageUrl.ToLower())).AsNoTracking().FirstOrDefault();
 
-            if (model.IsAutoOrder && model.LocationId == null)
+			Location location = null;
+			if (model.LocationId.HasValue)
+			{
+				location = _dbContext.Locations.FirstOrDefault(x => x.Id == model.LocationId && x.UserId == _userResolverService.GetUser());
+			}
+
+			if (model.IsAutoOrder && location == null)
             {
                 errors.Add(String.Format(ErrorResource.NotFound, "Location"));
                 return;
@@ -66,11 +72,7 @@ namespace TopSoSanh.Services.Implement
                 RecurringJob.AddOrUpdate<IProductTrackingService>(Guid.NewGuid().ToString(), x => x.ProductTracking(product.ItemUrl, hostName), Cron.Hourly);
             }
 
-            Location location = null;
-            if (model.LocationId.HasValue)
-            {
-                location = _dbContext.Locations.Where(x => x.Id == model.LocationId && x.UserId == _userResolverService.GetUser()).FirstOrDefault();
-            }
+            
 
             var notification = new Notification()
             {
@@ -161,32 +163,41 @@ namespace TopSoSanh.Services.Implement
             }
 
             var notifications = _dbContext.Notifications
-                .Where(x => x.ProductId == product.Id && x.Price >= newPrice);
+                .Where(x => x.ProductId == product.Id && x.Price >= newPrice && x.IsActive).Include(x => x.Product);
+
             foreach (var notification in notifications)
             {
                 if (!notification.IsAutoOrder)
                 {
-                    if (notification.IsActive)
-                    {
-                        _sendMailService.SendMailTrackingAsync(
-                            new Helper.MailContent()
-                            {
-                                To = notification.Email,
-                                Subject = "Thông báo thông tin giảm giá"
-                            },
-                            notification.UserName,
-                            product.Name,
-                            product.ItemUrl,
-                            product.ImageUrl,
-                            "https://" +
-                                hostName +
-                                $"/api/ProductTracking/UnSubscribe?email={notification.Email}&token={notification.Id}"
-                        );
-                    }
-                } 
+					_sendMailService.SendMailTrackingAsync(
+							new Helper.MailContent()
+							{
+								To = notification.Email,
+								Subject = "Thông báo thông tin giảm giá"
+							},
+							notification.UserName,
+							product.Name,
+							product.ItemUrl,
+							product.ImageUrl,
+							"https://" +
+								hostName +
+								$"/api/ProductTracking/UnSubscribe?email={notification.Email}&token={notification.Id}"
+						);
+				} 
                 else
                 {
-                    if (notification.IsActive && _autoOrderService.OrderGearvn(notification, productUrl))
+                    Func<Notification, string, bool> autoOrder;
+                    switch (notification.Product.Shop)
+                    {
+                        case Shop.Anphat:
+                            autoOrder = _autoOrderService.OrderAnPhat; break;
+						case Shop.Ankhang:
+							autoOrder = _autoOrderService.OrderAnKhang; break;
+                        default:
+							autoOrder = _autoOrderService.OrderGearvn; break;
+					}
+
+                    if (autoOrder(notification, productUrl))
                     {
                         _sendMailService.SendMailOrderAsync(
                             new Helper.MailContent()

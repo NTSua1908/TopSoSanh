@@ -82,6 +82,14 @@ namespace TopSoSanh.Services.Implement
                 errors.Add(string.Format(ErrorResource.NotFound, "Notification"));
                 return;
             }
+            if (string.IsNullOrEmpty(notification.Address) || string.IsNullOrEmpty(notification.Commune) 
+                || string.IsNullOrEmpty(notification.District) || string.IsNullOrEmpty(notification.OrderEmail) 
+                || string.IsNullOrEmpty(notification.OrderName) || string.IsNullOrEmpty(notification.PhoneNumber) 
+                || string.IsNullOrEmpty(notification.Province))
+            {
+				errors.Add("Address information is required");
+				return;
+			}
             notification.IsAutoOrder = !notification.IsAutoOrder;
             _dbContext.SaveChanges();
         }

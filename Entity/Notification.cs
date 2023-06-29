@@ -1,11 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
-using TopSoSanh.Helper;
-using System.ComponentModel;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace TopSoSanh.Entity
 {
-    public class Notification
+	public class Notification
     {
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid Id { get; set; }
@@ -13,13 +11,13 @@ namespace TopSoSanh.Entity
         public string UserName { get; set; }
 
         //Order information
-        public string Province { get; set; }
-        public string District { get; set; }
-        public string Commune { get; set; }
-        public string Address { get; set; }
-        public string PhoneNumber { get; set; }
-        public string OrderEmail { get; set; }
-        public string OrderName { get; set; }
+        public string? Province { get; set; }
+        public string? District { get; set; }
+        public string? Commune { get; set; }
+        public string? Address { get; set; }
+        public string? PhoneNumber { get; set; }
+        public string? OrderEmail { get; set; }
+        public string? OrderName { get; set; }
 
         public double Price { get; set; }
         public bool IsAutoOrder { get; set; }
